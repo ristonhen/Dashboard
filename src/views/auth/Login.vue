@@ -63,7 +63,6 @@
 
 <script>
 import axios from 'axios'
-import { useAuthStore } from '../../store/auth'
 export default {
   name: 'Login',
   data: () => ({
@@ -86,7 +85,7 @@ export default {
   }),
   methods:{
     submitHandler(){
-      const authStore = useAuthStore()
+      // const authStore = useAuthStore()
       const baseurl = this.$router.push('/')
       const url = 'http://127.0.0.1:8000/login'
       const formData = new FormData()
@@ -95,25 +94,16 @@ export default {
       axios
         .post(url,formData, {headers: { 'Content-Type': 'multipart/form-data'}})
         .then(function (response) {
-          // console.log("Log in Successfully")
+          console.log("Log in Successfully")
           // save the token to localStorage
-          authStore.login(response.data.access_token)
-          console.log(authStore.token)
           localStorage.setItem('token', response.data.access_token)
-          baseurl
+          // baseurl
         })
         .catch((error) => {
           console.log(error.response)
         })
       // console.log(this.$router.push('/'))
     }
-  },
-  setup(){
-    // const authStore = useAuthStore()
-    // const login = () => {
-    //   const token = 'token'
-    // }
-    // return { login }
   },
 }
 </script>
