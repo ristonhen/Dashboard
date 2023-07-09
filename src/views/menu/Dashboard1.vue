@@ -10,14 +10,35 @@
         sm="6"
       >
         <v-sheet 
-          class="bg-blue-grey-lighten-5 elevation-3" >
+          class="bg-blue-grey-lighten-5 elevation-3">
           <v-card
-            color="grey-lighten-4"
+            :color="dashboard.color"
             theme="dark"
           >
-          <div v-for="(spark,index) in sparks" :key="index" class="mt-4">
-            <apexchart type="area" :height="spark.cardMaxHeight" :options="spark.chartOptionsSpark" :series="spark.seriesSpark"/>
-          </div>
+            <div class="d-flex flex-no-wrap justify-space-between ">
+              <div>
+                <v-card-title class="text-h5">
+                  {{ dashboard.title }}
+                </v-card-title>
+                <v-card-subtitle>Foster the People</v-card-subtitle>
+                <v-card-actions class="">
+                  <v-btn
+                    class="ms-2 mt-6"
+                    variant="outlined"
+                    size="small"
+                  >
+                    Shw Detail
+                  </v-btn>
+                </v-card-actions>
+              </div>
+              <v-avatar
+                class="ma-3"
+                size="125"
+                rounded="0"
+              >
+                <v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg"></v-img>
+              </v-avatar>
+            </div>
           </v-card>
         </v-sheet>
       </v-col>
@@ -73,7 +94,6 @@ export default{
   name: 'deashboard',
   data(){
     return{
-      
       series: [
         { name: 'series1', data: [31, 40, 28, 51, 42, 109, 100]}, 
         { name: 'series2', data: [11, 32, 45, 32, 34, 52, 41]},
@@ -121,9 +141,6 @@ export default{
       },
     }
   },
-  computed(){
-
-  },
   setup(){
     const dashboards =ref([
       { "id": 1 ,"title": "Title item4", "desc": "Description details" , "color": "cyan-darken-2"},
@@ -131,42 +148,7 @@ export default{
       { "id": 3 ,"title": "Title item2", "desc": "Description details" , "color": "amber-accent-3"},
       { "id": 4 ,"title": "Title item3", "desc": "Description details" , "color": "red-darken-3"},
     ])
-    const sparks = [{
-        cardMaxHeight: 180,
-        seriesSpark: [
-          { name: 'Salse', 
-            data: [47, 45, 54, 38, 56, 24, 65, 31, 37, 39, 62, 51, 35, 41, 35, 27, 93, 53, 61, 27, 54, 43, 19, 46],
-          }, 
-        ],
-        chartOptionsSpark: {
-          chart: { // id: 'sparkline1', 
-            group: 'sparklines', type: 'area', height: 160, 
-            sparkline: { enabled: true },
-          },
-          fill: { opacity: 1, },
-          colors: ['#008FFB'],
-          title: { text: '$424,652', offsetX: 30,
-            style: { fontSize: '24px', cssClass: 'apexcharts-yaxis-title' }
-          },
-          subtitle: { text: "Sales", offsetX: 30, 
-            style: { fontSize: '14px', cssClass: 'apexcharts-yaxis-title'}
-          },
-          labels: [...Array(24).keys()].map(n => `2018-09-0${n+1}`),
-          dataLabels: { enabled: false },
-          stroke: { curve: 'smooth' },
-          xaxis: {
-            type: 'datetime',
-            categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-          },
-          tooltip: { x: {
-              format: 'dd/MM/yy HH:mm'
-            },
-          },
-        },
-      }]
-    const sparklineData = [47, 45, 54, 38, 56, 24, 65, 31, 37, 39, 62, 51, 35, 41, 35, 27, 93, 53, 61, 27, 54, 43, 19, 46];
-
-    return{ dashboards ,sparklineData,sparks}
+    return{ dashboards }
   }
 }
 
