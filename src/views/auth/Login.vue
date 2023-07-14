@@ -97,6 +97,7 @@ export default {
           console.log("Log in Successfully")
           // save the token to localStorage
           localStorage.setItem('token', response.data.access_token)
+          window.location.href='/';
           // baseurl
         })
         .catch((error) => {

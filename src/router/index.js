@@ -1,13 +1,21 @@
 import { createRouter, createWebHistory } from "vue-router"
 import DefaultLayout from '../layouts/DefaultLayout.vue'
 import BlankLayout from '../layouts/BlankLayout.vue'
-import { useAuthStore } from "../store/auth"
+import NotFound from '../layouts/NotFound.vue'
+import HomeVue from "../views/Home.vue"
+import DashboardVue from "../views/menu/Dashboard.vue"
+import ManageUserVue from "../views/menu/ManageUser.vue"
+import AdministratorToolsVue from "../views/menu/AdministratorTools.vue"
+import AboutVue from "../views/menu/About.vue"
+import ConfigurationVue from "../views/menu/Configuration.vue"
+import ReportVue from "../views/menu/Report.vue"
+import TeamVue from "../views/menu/Team.vue"
 
 const routes = [
   {
     path: '/:catchAll(.*)',
     name: 'NotFound',
-    component: () => import('../layouts/NotFound.vue'),
+    component: NotFound,
   },
   {
     path: '',
@@ -17,7 +25,7 @@ const routes = [
       {
         path: '',
         name: 'Home',
-        component: () => import('../views/Home.vue'),
+        component: HomeVue,
         meta: {
           requiresAuth: true
         },
@@ -30,50 +38,71 @@ const routes = [
           {
             path: '/Dashboard',
             name: 'Dashboard',
-            component: () => import('../views/menu/Dashboard.vue'),
+            component: DashboardVue,
             meta: {
               requiresAuth: true
             }
           },
           {
+            path: '/User',
+            name: 'User_&_Permission',
+            props: true,
+            component: BlankLayout,
+            children: [
+              {
+                path: '/User/:id',
+                name: 'User',
+                component: ManageUserVue,
+              }
+            ]
+          },
+          {
+            path: '/Administrator',
+            name: 'Administrator',
+            props: true,
+            component: BlankLayout,
+            children: [
+              {
+                path: '/Administrator/:id',
+                name: 'Admin',
+                component: AdministratorToolsVue,
+              }
+            ]
+          },
+          {
             path: '/about',
             name: 'About',
             props: true,
-            component: () => import('../views/menu/About.vue')
+            component: AboutVue,
           },
           {
             path: '/Configuration',
             name: 'Configuration',
             props: true,
-            component: () => import('../views/menu/Configuration.vue')
+            component: ConfigurationVue
           },
-          {
-            path: '/todo',
-            name: 'Todo',
-            props: true,
-            component: () => import('../views/menu/Todo.vue')
-          },
-          {
-            path: '/user-config',
-            name: 'User-config',
-            props: true,
-            component: () => import('../views/menu/ManageUser.vue')
-          },
+          
           {
             path: '/Configuration',
             name: 'Configuration',
             props: true,
-            component: () => import('../views/menu/Configuration.vue')
+            component: ConfigurationVue
           },
           {
             path: '/report',
             name: 'Report',
             props: true,
-            component: () => import('../views/menu/Report.vue')
+            component: ReportVue
           },
           {
             path: '/Team',
             name: 'Team',
+            props: true,
+            component: TeamVue
+          },
+          {
+            path: '/test',
+            name: 'test',
             props: true,
             component: () => import('../views/menu/Team.vue')
           },
@@ -98,17 +127,15 @@ const routes = [
     ]
   }
 ]
-
 const router = createRouter({
   history: createWebHistory(),
   routes,
 })
-
 // check token before login and dynamic header title name
 router.beforeEach((to, from, next) => {
+
   // get token from localStorage
   const token = localStorage.getItem('token')
-  // const token = useAuthStore()
   
   if(to.matched.some(record => record.meta.requiresAuth)){
     if (!token) {

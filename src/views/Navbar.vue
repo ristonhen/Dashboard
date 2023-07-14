@@ -58,14 +58,29 @@ export default {
     ],
     menu: [
       { title: 'Dashboard', icon: 'mdi-view-dashboard',to: '',to_name: "",sub: false },
-      { title: 'Todo', icon: 'mdi-format-list-checkbox',to: '/todo',to_name: "Todo",sub: false },
-      { title: 'About', icon: 'mdi-information' ,to: '/about', to_name: "About",sub: false },
-      { title: 'User-config', icon: 'mdi-account-cog-outline',to: '/user-config' ,sub: true , 
+      { title: 'User & Permission', icon: 'mdi-account-cog-outline',to: '/User' ,sub: true , 
         admins: [
-          {title:'Add user', icon: 'mdi-account-multiple-outline',to: '/user-config' },
-          {title:'Reset password', icon: 'mdi-cog-outline',to: '/user-config' }
+          {title:'Create Users', icon: 'mdi-account-multiple-outline',to: { name: 'User', params: { id: 'CreateUser' } },},
+          {title:'Reset password', icon: 'mdi-cog-outline',to: { name: 'User', params: { id: 'ResetPassword' } },},
+          {title:'Create Role', icon: 'mdi-cog-outline',to: { name: 'User', params: { id: 'CreateRole' } },},
+          {title:'Role Permission', icon: 'mdi-cog-outline',to: { name: 'User', params: { id: 'RolePermission' } },}
         ],
       },
+      { title: 'Administrator Tools', icon: 'mdi-cogs',to: '/Administrator' ,sub: true , 
+        admins: [
+          {title:'Exchange Rate', icon: 'mdi-account-multiple-outline',to: { name: 'Admin', params: { id: 'ExchangeRate' } },},
+          {title:'Online Counter', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'OnlineCounter' } },},
+          {title:'Free Counter', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'FreeCounter' } },},
+          {title:'Online Ticket & TV', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'OnlineTicket&TV' } },},
+          {title:'Create Branch', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'CreateBranch' } },},
+          {title:'Create Service', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'Create Service' } },},
+          {title:'Branch Service', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'BranchService' } },},
+          {title:'Counter Service', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'CounterService' } },},
+          {title:'Queue Monitoring', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'QueueMonitoring' } },},
+          {title:'Import Video', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'ImportVideo' } },},
+        ],
+      },
+      { title: 'Configuration', icon: 'mdi-cog-transfer' ,to: '/configuration',sub: false },
       { title: 'Report', icon: 'mdi-chart-areaspline',to: '/report' ,sub: true,
         admins: [
           { title : 'Create', icon: 'mdi-plus-outline',to: '/Report' },
@@ -74,14 +89,8 @@ export default {
           // { title : 'Delete', icon: 'mdi-delete',to: '/Report' },
         ]
       },
-      { title: 'Configuration', icon: 'mdi-cog-transfer' ,to: '/configuration',sub: false },
       { title: 'Team', icon: 'mdi-microsoft-teams', to: '/team',sub: false },
-      { title: 'Add-more-item ', icon: 'mdi-timer-cog', sub: true, 
-        admins: [
-          {title:'Management', icon: 'mdi-account-multiple-outline' },
-          {title:'Settings', icon: 'mdi-cog-outline' }
-      ]},
-      
+      { title: 'About', icon: 'mdi-information' ,to: '/about', to_name: "About",sub: false },
     ],  
   }),
   // created() {
@@ -95,21 +104,16 @@ export default {
       if(this.items[0] ==''){
         return true
       }
-
     }
   },
   watch:{
     $route(){
       // this.pageTitle = this.$route.matched[2].name
       // console.log(this.$route.matched[2].name)
-    //   this.items = []
-    //   this.items.push(this.$route.matched[2].name)
-
+      //   this.items = []
+      //   this.items.push(this.$route.matched[2].name)
     },
-    
-    
   },
-  
 }
 </script>
 <style>

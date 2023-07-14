@@ -4,11 +4,8 @@
     <!-- Breadcrums -->
     <v-breadcrumbs 
       :items="items" 
-      divider="|"
+      divider="/"
     >
-      <template v-slot:divider>
-        <v-icon icon="mdi-chevron-right"></v-icon>   
-      </template>
       <template v-slot:title="{ item }">
         <span>{{ item.title }}</span>
       </template>
@@ -29,15 +26,29 @@ export default {
       const nameRoute = this.$route.matched[2].name
       this.items.push(
         {'title': "Home",'to': '/'},
-        {'title':nameRoute, disabled: true},
-        // {'title':this.$route.matched[2].name,disabled: true, 'href': this.$route.matched[2].path}
-      ) 
-    },
+        {'title':nameRoute , disabled: true, 'href': this.$route.matched[2].path},
+        // {'title':this.userId,disabled: true, 'href': this.$route.matched[2].path}
+      )
+      if(this.$route.params.id){
+        this.items.push(
+          {'title':this.userId, disabled: true, 'href': this.$route.matched[2].path}
+        )
+        if(this.items.length === 3 && this.items[1].disabled){
+          this.items[1].disabled = false
+        }
+      }
+    },  
+  },
+  computed: {
+    userId() {
+      return this.$route.params.id;
+    }
   },
   watch:{
     $route(){
       this.getRoute()
       // console.log(this.$route.name);
+      console.log(this.items[1]);
     }
   },
   created(){
@@ -45,7 +56,8 @@ export default {
   }
 }
 </script>
-
-<style>
-
+<style scoped>
+.v-breadcrumbs-divider {
+    padding: 0 0px
+}
 </style>
