@@ -1,27 +1,27 @@
 <template>
-    <v-main>
-      <v-container
-        class="bg-blue-grey-lighten-5 h-100 pt-0"
-        fluid
-      >
-        <!-- Breadcrums -->
-        <Breadcrumbs />
-        <router-view/>
-        <div class="tbn-scroll">
-          <v-btn 
-            v-scroll="onScroll"
-            v-show="fab"
-            icon="mdi-chevron-up" 
-            color="blue-darken-3"
-            @click="toTop"
-          ></v-btn>
-        </div>
-        <!-- APP FOOTER -->
-        <Footer />
-      </v-container>
-    </v-main>
-  </template>
-  <script>
+  <v-main>
+    <v-container
+      class="bg-blue-grey-lighten-5 h-100 pt-0"
+      fluid
+    >
+      <!-- Breadcrums -->
+      <Breadcrumbs />
+      <router-view/>
+      <div class="tbn-scroll">
+        <v-btn 
+          v-scroll="onScroll"
+          v-show="fab"
+          icon="mdi-chevron-up" 
+          color="blue-darken-3"
+          @click="toTop"
+        ></v-btn>
+      </div>
+      <!-- APP FOOTER -->
+      <Footer />
+    </v-container>
+  </v-main>
+</template>
+<script>
   import Breadcrumbs from './Breadcrumbs.vue'
   import Footer from './Footer.vue'
   export default {

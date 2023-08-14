@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from "vue-router"
-import DefaultLayout from '../layouts/DefaultLayout.vue'
-import BlankLayout from '../layouts/BlankLayout.vue'
-import NotFound from '../layouts/NotFound.vue'
-import HomeVue from "../views/Home.vue"
-import DashboardVue from "../views/menu/Dashboard.vue"
-import ManageUserVue from "../views/menu/ManageUser.vue"
-import AdministratorToolsVue from "../views/menu/AdministratorTools.vue"
-import AboutVue from "../views/menu/About.vue"
-import ConfigurationVue from "../views/menu/Configuration.vue"
-import ReportVue from "../views/menu/Report.vue"
-import TeamVue from "../views/menu/Team.vue"
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import BlankLayout from '@/layouts/BlankLayout.vue'
+import NotFound from '@/layouts/NotFound.vue'
+import HomeVue from '@/views/Home.vue'
+import DashboardVue from "@/views/menu/Dashboard.vue"
+import ManageUserVue from "@/views/menu/ManageUser.vue"
+import AdministratorToolsVue from "@/views/menu/AdministratorTools.vue"
+import AboutVue from "@/views/menu/About.vue"
+import ConfigurationVue from "@/views/menu/Configuration.vue"
+import ReportVue from "@/views/menu/Report.vue"
+import TeamVue from "@/views/menu/Team.vue"
 
 const routes = [
   {
@@ -154,6 +154,6 @@ router.beforeEach((to, from, next) => {
     next();
   }
   // Set the document title based on the name of the current route
-  document.title = to.name + ' - ADMINAPP';
+  document.title = to.name + ' - APP';
 });
 export default router

@@ -31,8 +31,8 @@
     <!-- CONTAINER -->
     <Container />
   </v-app>
-  </template>
-  <script>
+</template>
+<script>
   import { useAuthStore } from '../store/auth'
   import Navbar from './Navbar.vue'
   import Headers from './Headers.vue'
@@ -74,8 +74,8 @@
       // }
     }
   }
-  </script>
-  <style lang="sass">
+</script>
+<style lang="sass">
   .v-navigation-drawer__content
     height: 100%
     overflow-y: auto
@@ -87,4 +87,4 @@
       background: black                                 
       border-radius: 20px
       background: gray
-  </style>
+</style>
