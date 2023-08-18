@@ -34,9 +34,9 @@
 </template>
 <script>
   import { useAuthStore } from '../store/authStore'
-  import Navbar from './dashboard/Navbar.vue'
-  import Headers from './dashboard/Headers.vue'
-  import Container from './dashboard/Container.vue'
+  import Navbar from './Navbar.vue'
+  import Headers from './Headers.vue'
+  import Container from './Container.vue'
   export default {
     name: 'Home',
     components: { Navbar, Headers , Container },

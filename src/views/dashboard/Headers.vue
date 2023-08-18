@@ -117,7 +117,7 @@
             <v-btn
               color="red-darken-4"
               variant="text"
-              @click="logout"
+              @click="authStore.logout"
             >
               LOG OUT
               <v-icon icon="mdi-logout" class="ps-4"></v-icon>
@@ -129,7 +129,7 @@
   </v-app-bar>
 </template>
 <script>
-import { useAuthStore } from '../store/auth';
+import { useAuthStore } from '@/store/authStore';
 export default {
   props: [ 'drawer' ],
   data(){
@@ -184,11 +184,6 @@ export default {
       const newValue = !this.drawer
       this.$emit('toggleDrawer', newValue);
     },
-    logout1(){
-      const authStore = useAuthStore()
-      console.log(authStore.token)
-      this.profile = false
-    },
     toggleFullScreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
@@ -200,16 +195,17 @@ export default {
     },
   },
   setup() {
-    const authStore = useAuthStore(); // use the auth store in the component
-    const useStore  = useAuthStore
+    const authStore = useAuthStore() // use the auth store in the component
+    // const useStore  = useAuthStore
     // define the logout function
-    const logout = () => {
-      console.log(authStore.user) // dispatch a logout action to the store
-    };
+    // const logout = () => {
+    //   console.log(authStore.user) // dispatch a logout action to the store
+    // };
 
     return {
-      logout,
-    };
+      // logout,
+      authStore
+    }
   },
 }
 </script>

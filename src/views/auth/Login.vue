@@ -58,11 +58,11 @@
       Login success
     </v-snackbar>
   </v-app>
-  
+  <p>{{ message }}</p>
 </template>
 
 <script>
-import axios from 'axios'
+import { useAuthStore } from '@/store/authStore'
 export default {
   name: 'Login',
   data: () => ({
@@ -76,7 +76,7 @@ export default {
       v => !!v || 'E-mail is required',
       v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
     ],
-    password: '123',
+    password: 'Cana#123',
     passwordRules: [
       v => !!v || 'Password is required',
       v => (v && v.length >= 6) || 'Password must be 6  characters or more!',
@@ -85,27 +85,17 @@ export default {
   }),
   methods:{
     submitHandler(){
-      // const authStore = useAuthStore()
-      const baseurl = this.$router.push('/')
-      const url = 'http://127.0.0.1:8000/login'
-      const formData = new FormData()
-      formData.append('username', this.username)
-      formData.append('password', this.password)
-      axios
-        .post(url,formData, {headers: { 'Content-Type': 'multipart/form-data'}})
-        .then(function (response) {
-          console.log("Log in Successfully")
-          // save the token to localStorage
-          localStorage.setItem('token', response.data.access_token)
-          window.location.href='/';
-          // baseurl
-        })
-        .catch((error) => {
-          console.log(error.response)
-        })
-      // console.log(this.$router.push('/'))
+      const userStore = useAuthStore();
+      userStore.setCredentials(this.username,this.password)
+      userStore.submitHandler()
+      
     }
   },
+  setup(){
+    const userStore = useAuthStore();
+    const message = userStore.getUsername
+    return { message }
+  }
 }
 </script>
 <style>
