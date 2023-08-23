@@ -93,13 +93,8 @@ export default {
       { title: 'About', icon: 'mdi-information' ,to: '/about', to_name: "About",sub: false },
     ],  
   }),
-  // created() {
-  //   document.title = this.$route.matched[2].name
-  // },
+
   methods:{
-    // updateTitle(){
-    //   this.pageTitle = this.$route.matched[2].name
-    // },
     activeClass(){
       if(this.items[0] ==''){
         return true
@@ -108,10 +103,6 @@ export default {
   },
   watch:{
     $route(){
-      // this.pageTitle = this.$route.matched[2].name
-      // console.log(this.$route.matched[2].name)
-      //   this.items = []
-      //   this.items.push(this.$route.matched[2].name)
     },
   },
 }

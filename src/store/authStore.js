@@ -13,12 +13,9 @@ export const useAuthStore = defineStore(
       token: '',
     }),
     actions: {
-      setCredentials(username, password) {
-        this.username = username;
-        this.password = password;
-      },
-      setToken(token) {
+      setTokenAndUser(user,token) {
         this.token = token;
+        localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('token', token);
       },
       clearCredentials() {
@@ -28,12 +25,12 @@ export const useAuthStore = defineStore(
       },
       logout() {
         localStorage.removeItem('token')
-        window.location.href='/'
+        window.location.reload()
       },
-      async submitHandler() {
+      async submitHandler(username , password) {
         const formData = new FormData();
-        formData.append('username', this.username);
-        formData.append('password', this.password);
+        formData.append('username', username);
+        formData.append('password', password);
         try {
           const response = await axios.post(baseUrl, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -41,7 +38,8 @@ export const useAuthStore = defineStore(
           if (response.status === 200 ) {
             console.log("Log in Successfully");
             this.isAuthenticated = true;
-            this.setToken(response.data.access_token);
+            this.setTokenAndUser(response.data.user,
+                                      response.data.access_token);
             window.location.href='/';
           } else {
             // Failed login

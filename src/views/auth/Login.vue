@@ -86,8 +86,7 @@ export default {
   methods:{
     submitHandler(){
       const userStore = useAuthStore();
-      userStore.setCredentials(this.username,this.password)
-      userStore.submitHandler()
+      userStore.submitHandler(this.username,this.password)
       
     }
   },
