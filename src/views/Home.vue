@@ -33,10 +33,12 @@
   </v-app>
 </template>
 <script>
-  import { useAuthStore } from '../store/authStore'
+  import { useAuthStore } from '@/store/authStore'
+  import { onMounted } from 'vue'
   import Navbar from './dashboard/Navbar.vue'
   import Headers from './dashboard/Headers.vue'
   import Container from './dashboard/Container.vue'
+  import { storeToRefs } from 'pinia'
   export default {
     name: 'Home',
     components: { Navbar, Headers , Container },
@@ -55,25 +57,19 @@
       toggleRail(newRail){
         this.drawer = newRail
       },
+      
     },
-    setup(){
-      return {  }
+    setup() {
+      const useStore = useAuthStore();
+      const user = useStore.getUser;
+      onMounted(() => {
+        // console.log(user); // Log the user object to the console after component is mounted
+      });
+
+      return {
+        user,
+      };
     },
-    mounted() {
-      const auth = useAuthStore()
-      this.token = localStorage.getItem('token')
-      console.log(auth.username)
-    },
-    watch: {
-      // 'auth.token': {
-      //   handler(newVal) {
-      //     if (!auth.isAuthenticated()) {
-      //       this.$router.push('/login')
-      //     }
-      //   },
-      //   immediate: true
-      // }
-    }
   }
 </script>
 <style lang="sass">

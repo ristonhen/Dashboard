@@ -10,7 +10,7 @@ import AboutVue from "@/views/menu/About.vue"
 import ConfigurationVue from "@/views/menu/Configuration.vue"
 import ReportVue from "@/views/menu/Report.vue"
 import TeamVue from "@/views/menu/Team.vue"
-
+import { useAuthStore } from '@/store/authStore'
 const routes = [
   {
     path: '/:catchAll(.*)',
@@ -104,7 +104,7 @@ const routes = [
             path: '/test',
             name: 'test',
             props: true,
-            component: () => import('../views/menu/Team.vue')
+            component: () => import('../views/menu/test.vue')
           },
           
         ]
@@ -133,9 +133,9 @@ const router = createRouter({
 })
 // check token before login and dynamic header title name
 router.beforeEach((to, from, next) => {
-
+  const authStore = useAuthStore()
   // get token from localStorage
-  const token = localStorage.getItem('token')
+  const token = authStore.getToken
   
   if(to.matched.some(record => record.meta.requiresAuth)){
     if (!token) {

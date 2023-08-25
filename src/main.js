@@ -11,9 +11,8 @@ const pinia = createPinia()
 loadFonts()
 
 createApp(App)
-  .use(router)
   .use(pinia)
-
+  .use(router)
   .use(vuetify)
   .use(VueApexCharts)
   .mount('#app')

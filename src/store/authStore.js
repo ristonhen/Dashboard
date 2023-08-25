@@ -1,33 +1,40 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
 const baseUrl = `${import.meta.env.VITE_API_URL}/login`;
-
 export const useAuthStore = defineStore(
   'auth', 
   {
     state: () => ({
-      message: 'Hello, Pinia!',
       isAuthenticated: false,
-      username: '',
-      password: '',
-      token: '',
+      token: null,
+      user: null,
+      name: 'risto',
     }),
     actions: {
+      setUser(user) {
+        this.user = user;
+      },
       setTokenAndUser(user,token) {
         this.token = token;
         localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('token', token);
       },
-      clearCredentials() {
-        this.username = ''
-        this.password = ''
-        this.token = ''
+      checkTokenValidity() {
+        const token = this.getToken
+        const tokenIsValid = token !== null && token !== undefined;
+        if (!tokenIsValid) {
+          // Token is not available or expired, redirect to login page
+          // You can use Vue Router to perform the redirection
+          // router.push('/login');
+          // window.location.reload()
+        }
       },
       logout() {
         localStorage.removeItem('token')
+        localStorage.removeItem('user')
         window.location.reload()
       },
-      async submitHandler(username , password) {
+      async submitHandler(username, password) {
         const formData = new FormData();
         formData.append('username', username);
         formData.append('password', password);
@@ -36,11 +43,10 @@ export const useAuthStore = defineStore(
             headers: { 'Content-Type': 'multipart/form-data' }
           })
           if (response.status === 200 ) {
-            console.log("Log in Successfully");
-            this.isAuthenticated = true;
-            this.setTokenAndUser(response.data.user,
-                                      response.data.access_token);
-            window.location.href='/';
+            const { user, access_token } = response.data;
+            this.setUser(user);
+            this.setTokenAndUser(user,access_token);
+            window.location.reload();
           } else {
             // Failed login
             this.isAuthenticated = false;
@@ -51,12 +57,15 @@ export const useAuthStore = defineStore(
       }
     },
     getters: {
-      getUsername() {
-        return this.username;
+      getUser() {
+        this.user = JSON.parse(localStorage.getItem('user'))
+        return this.user;
       },
       getToken() {
+        this.token = localStorage.getItem('token')
         return this.token;
       },
+      
     }
   }
 )
