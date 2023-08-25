@@ -27,7 +27,6 @@ export default {
       this.items.push(
         {'title': "Home",'to': '/'},
         {'title':nameRoute , disabled: true, 'href': this.$route.matched[2].path},
-        // {'title':this.userId,disabled: true, 'href': this.$route.matched[2].path}
       )
       if(this.$route.params.id){
         this.items.push(
@@ -46,9 +45,7 @@ export default {
   },
   watch:{
     $route(){
-      this.getRoute()
-      // console.log(this.$route.name);
-      console.log(this.items[1]);
+      this.getRoute() // console.log(this.$route.name); // console.log(this.items[1]);
     }
   },
   created(){
