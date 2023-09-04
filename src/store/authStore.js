@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
 const baseUrl = `${import.meta.env.VITE_API_URL}/login`;
 export const useAuthStore = defineStore(
   'auth', 
@@ -43,9 +44,12 @@ export const useAuthStore = defineStore(
             headers: { 'Content-Type': 'multipart/form-data' }
           })
           if (response.status === 200 ) {
-            const { user, access_token } = response.data;
+            const { user, access_token } = response.data
+            const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), '123').toString();
+            const encryptedToken = CryptoJS.AES.encrypt(access_token, '123').toString();
             this.setUser(user);
-            this.setTokenAndUser(user,access_token);
+            this.setTokenAndUser(user,encryptedToken)
+            // this.setTokenAndUser(user,access_token);
             window.location.reload();
           } else {
             // Failed login
@@ -58,12 +62,20 @@ export const useAuthStore = defineStore(
     },
     getters: {
       getUser() {
-        this.user = JSON.parse(localStorage.getItem('user'))
-        return this.user;
+        const data = JSON.parse(localStorage.getItem('user'))
+        const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), 'secret key 123').toString();
+        const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+        const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        console.log(decryptedData); // [{id: 1}, {id: 2}]
+        return decryptedData
       },
       getToken() {
-        this.token = localStorage.getItem('token')
-        return this.token;
+        const encryptedToken = localStorage.getItem('token')
+        if(encryptedToken){
+          const decryptedToken = CryptoJS.AES.decrypt(encryptedToken, '123').toString(CryptoJS.enc.Utf8)
+          return decryptedToken
+        }
+        return null
       },
       
     }

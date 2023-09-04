@@ -47,6 +47,7 @@
   </v-list>
 </template>
 <script>
+import CryptoJS from 'crypto-js'
 import { useAuthStore } from '@/store/authStore'
 import  axios  from 'axios'
 import { onMounted, ref } from 'vue';
@@ -97,32 +98,50 @@ export default {
     // ],  
   }),
   methods:{
+    getUser() {
+      // const data = [{id: 1}, {id: 2}]
+      // const data = JSON.parse(localStorage.getItem('user'))
+      // const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), 'secret key 123').toString();
+      // console.log(ciphertext)
+      // const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+      // const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      // console.log(decryptedData); // [{id: 1}, {id: 2}]
+    },
     async fetchData(){
       const authStore = useAuthStore()
-      const baseUrl = `${import.meta.env.VITE_API_URL}/getmenuassignedrole`
+      const baseUrl = `${import.meta.env.VITE_API_URL}/menu/getmenuassignedrole`
       const token = authStore.getToken
+      const u = authStore.getUser
+      console.log(u)
       try {
-        if (token){
-          const response = await axios.get(baseUrl, {
-            headers: { 'Content-Type': 'application/json' },
-            headers: {Authorization: `Bearer ${token}`}
+        if (token ){
+          const response = await axios.post(baseUrl,{
+            roleid: 1
+          }, 
+          {
+            headers: { 'Content-Type': 'application/json',Authorization: `Bearer ${token}` },
           })
           if (response.status === 200 ) {
             console.log(response.data.data)
-            // this.menu = response.data.data
             const filteredData = response.data.data.filter(item => item.pms_parent_id === null)
             this.menu = filteredData
           } else {
-            // Failed login
+            // Handle failed login or other error scenarios
           }
         }
       } catch (error) {
         console.log(error.response);
+        if (error.response && error.response.data && error.response.data.detail) {
+          const errorDetails = error.response.data.detail;
+          console.log('Error details:', errorDetails);
+          // Handle the error or display the error messages to the user
+        }
       }
     }
   },
   mounted(){
     this.fetchData()
+    // this.getUser()
   }
 }
 </script>

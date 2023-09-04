@@ -42,3 +42,7 @@ dependency to your project.
 ```sh
 npm i webfontloader
 ```
+dependency to your project.
+```sh
+npm install crypto-js
+```
