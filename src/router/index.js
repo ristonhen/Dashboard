@@ -136,7 +136,6 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   // get token from localStorage
   const token = authStore.getToken
-  
   if(to.matched.some(record => record.meta.requiresAuth)){
     if (!token) {
       next('/login');

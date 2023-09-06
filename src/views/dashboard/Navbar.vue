@@ -1,132 +1,95 @@
 <template>
   <v-list density="compact" nav>
-    <div v-for="(item,index) in menu" :key="index"
-      style="padding: 2px 0;"
-    > 
-      <!-- :to="{ name : item.title}" -->
-      <v-list-item
-        active-class="bg-blue-grey-darken-2"
-        prepend-icon="mdi-view-dashboard"  
-        :title="item.pms_menu_name" 
-      >
-      </v-list-item>
-      <!-- dropdown -->
-      <!-- <div v-else>
-        <v-list-group :value="item.title">
+    <v-list-group v-for="(item, index) in menuItems" :key="index" :value="item.pms_menu_name">
+      <template v-slot:activator="{ props }">
+        <v-list-item
+          v-bind="props"
+          :prepend-icon="item.pms_menu_image"
+          :title="item.pms_menu_name"
+        ></v-list-item>
+      </template>
+
+      <v-list-group v-for="(submenu, i) in item.submenus" :key="i" :value="submenu.pms_menu_name">
+        <template v-slot:activator="{ props }">
+          <v-list-item v-bind="props" :title="submenu.pms_menu_name"></v-list-item>
+        </template>
+
+        <v-list-group v-for="(childsubitem, j) in submenu.submenus" :key="j" :value="childsubitem.title">
           <template v-slot:activator="{ props }">
-            <v-list-item
-              active-color="bg-blue-grey-darken-2"
-              v-bind="props"
-              :prepend-icon="item.icon"
-              :title="item.title" 
-              :value="item" 
-            >
-            </v-list-item>
+            <v-list-item v-bind="props" :title="childsubitem.pms_menu_name"></v-list-item>
           </template>
-          <v-list density="compact" nav class="pa-0 ma-0">
+
           <v-list-item
-            active-class="bg-blue-grey-darken-2"
-            v-for="a in item.admins" :key="a"
-            :value="a.title"
-            :title="a.title"
-            :to="a.to"
-          >
-            <template v-slot:prepend>
-              <v-icon
-                style="margin-left: 4px;"
-                variant="text"
-                size="15"
-                icon="mdi-circle-outline"
-              ></v-icon>
-            </template>
-          </v-list-item>
-          </v-list>
+            v-for="(itemss, k) in childsubitem.submenus"
+            :key="k"
+            :title="itemss.pms_menu_name"
+            :prepend-icon="itemss.icon"
+            :value="itemss.title"
+          ></v-list-item>
         </v-list-group>
-      </div> -->
-    </div>
+      </v-list-group>
+    </v-list-group>
   </v-list>
 </template>
 <script>
-import CryptoJS from 'crypto-js'
 import { useAuthStore } from '@/store/authStore'
 import  axios  from 'axios'
 import { onMounted, ref } from 'vue';
 export default {
   name: 'Navbar',
   data: () => ({ 
-    pageTitle: 'MY PAGE TITLE',
-    items:[],
-    manageApp: [
-    //   { apptitle: 'App Admin', logo: './assets/img/app-logo.png' } 
-    ],
-    menu: null,
-    // menu: [
-    //   { title: 'Dashboard', icon: 'mdi-view-dashboard',to: '',to_name: "",sub: false },
-    //   { title: 'User & Permission', icon: 'mdi-account-cog-outline',to: '/User' ,sub: true , 
-    //     admins: [
-    //       {title:'Create Users', icon: 'mdi-account-multiple-outline',to: { name: 'User', params: { id: 'CreateUser' } },},
-    //       {title:'Reset password', icon: 'mdi-cog-outline',to: { name: 'User', params: { id: 'ResetPassword' } },},
-    //       {title:'Create Role', icon: 'mdi-cog-outline',to: { name: 'User', params: { id: 'CreateRole' } },},
-    //       {title:'Role Permission', icon: 'mdi-cog-outline',to: { name: 'User', params: { id: 'RolePermission' } },}
-    //     ],
-    //   },
-    //   { title: 'Administrator Tools', icon: 'mdi-cogs',to: '/Administrator' ,sub: true , 
-    //     admins: [
-    //       {title:'Exchange Rate', icon: 'mdi-account-multiple-outline',to: { name: 'Admin', params: { id: 'ExchangeRate' } },},
-    //       {title:'Online Counter', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'OnlineCounter' } },},
-    //       {title:'Free Counter', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'FreeCounter' } },},
-    //       {title:'Online Ticket & TV', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'OnlineTicket&TV' } },},
-    //       {title:'Create Branch', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'CreateBranch' } },},
-    //       {title:'Create Service', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'Create Service' } },},
-    //       {title:'Branch Service', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'BranchService' } },},
-    //       {title:'Counter Service', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'CounterService' } },},
-    //       {title:'Queue Monitoring', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'QueueMonitoring' } },},
-    //       {title:'Import Video', icon: 'mdi-cog-outline',to: { name: 'Admin', params: { id: 'ImportVideo' } },},
-    //     ],
-    //   },
-    //   { title: 'Configuration', icon: 'mdi-cog-transfer' ,to: '/configuration',sub: false },
-    //   { title: 'Report', icon: 'mdi-chart-areaspline',to: '/report' ,sub: true,
-    //     admins: [
-    //       { title : 'Create', icon: 'mdi-plus-outline',to: '/Report' },
-    //       // { title : 'Read', icon: 'mdi-file-outline',to: '/Report' },
-    //       // { title : 'Update', icon: 'mdi-update',to: '/Report' },
-    //       // { title : 'Delete', icon: 'mdi-delete',to: '/Report' },
-    //     ]
-    //   },
-    //   { title: 'Team', icon: 'mdi-microsoft-teams', to: '/team',sub: false },
-    //   { title: 'About', icon: 'mdi-information' ,to: '/about', to_name: "About",sub: false },
-    // ],  
+    menuItems: [], 
   }),
   methods:{
-    getUser() {
-      // const data = [{id: 1}, {id: 2}]
-      // const data = JSON.parse(localStorage.getItem('user'))
-      // const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), 'secret key 123').toString();
-      // console.log(ciphertext)
-      // const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
-      // const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-      // console.log(decryptedData); // [{id: 1}, {id: 2}]
+    getUser(){
+      const data = JSON.parse(localStorage.getItem('user'))
+      const bytes  = CryptoJS.AES.decrypt(data, 'Cana!@#123');
+      const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      return decryptedData
     },
     async fetchData(){
       const authStore = useAuthStore()
       const baseUrl = `${import.meta.env.VITE_API_URL}/menu/getmenuassignedrole`
       const token = authStore.getToken
-      const u = authStore.getUser
-      console.log(u)
       try {
         if (token ){
-          const response = await axios.post(baseUrl,{
-            roleid: 1
-          }, 
-          {
-            headers: { 'Content-Type': 'application/json',Authorization: `Bearer ${token}` },
-          })
-          if (response.status === 200 ) {
-            console.log(response.data.data)
-            const filteredData = response.data.data.filter(item => item.pms_parent_id === null)
-            this.menu = filteredData
+          const res = await axios.get(baseUrl,
+            {
+              headers: { 'Content-Type': 'application/json',Authorization: `Bearer ${token}` },
+            })
+          const response = res.data;
+          if (response.status === true) {
+            // Create a recursive function to generate the submenu
+            function generateSubMenu(menuItems, parentId) {
+              const submenus = response.data.filter((item) => item.pms_parent_id === parentId)
+
+              return submenus
+              .sort((a, b) => a.pms_menu_index - b.pms_menu_index)
+              .map((menuItem) => ({
+                pmsid: menuItem.pmsid,
+                pms_menu_name: menuItem.pms_menu_name,
+                pms_menu_image: menuItem.pms_menu_image,
+                pms_page_name: menuItem.pms_page_name,
+                pms_menu_index: menuItem.pms_menu_index,
+                submenus: generateSubMenu(menuItems, menuItem.pmsid),
+              }))
+            }
+            // Filter top-level items
+            const topLevelItems = response.data.filter((item) => item.pms_menu_level === '1')
+            // Generate the menu structure
+            this.menuItems = topLevelItems
+              .sort((a, b) => a.pms_menu_index - b.pms_menu_index)
+              .map((menuItem) => ({
+              pmsid: menuItem.pmsid,
+              pms_menu_name: menuItem.pms_menu_name,
+              pms_menu_image: menuItem.pms_menu_image,
+              pms_page_name: menuItem.pms_page_name,
+              pms_menu_index: menuItem.pms_menu_index,
+              submenus: generateSubMenu(this.menuItems, menuItem.pmsid),
+            }));
+          console.log(this.menuItems)
           } else {
-            // Handle failed login or other error scenarios
+            console.log('Failed to retrieve menu items');
           }
         }
       } catch (error) {
@@ -142,6 +105,8 @@ export default {
   mounted(){
     this.fetchData()
     // this.getUser()
+    console.log(import.meta.env.VITE_SOME_KEY) // 123
+    console.log(import.meta.env.NEW_KEY1) // undefined
   }
 }
 </script>

@@ -12,24 +12,13 @@ export const useAuthStore = defineStore(
       name: 'risto',
     }),
     actions: {
-      setUser(user) {
-        this.user = user;
-      },
       setTokenAndUser(user,token) {
+        this.user = user
         this.token = token;
         localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', JSON.stringify(token));
       },
-      checkTokenValidity() {
-        const token = this.getToken
-        const tokenIsValid = token !== null && token !== undefined;
-        if (!tokenIsValid) {
-          // Token is not available or expired, redirect to login page
-          // You can use Vue Router to perform the redirection
-          // router.push('/login');
-          // window.location.reload()
-        }
-      },
+      
       logout() {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
@@ -45,11 +34,9 @@ export const useAuthStore = defineStore(
           })
           if (response.status === 200 ) {
             const { user, access_token } = response.data
-            const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), '123').toString();
-            const encryptedToken = CryptoJS.AES.encrypt(access_token, '123').toString();
-            this.setUser(user);
-            this.setTokenAndUser(user,encryptedToken)
-            // this.setTokenAndUser(user,access_token);
+            const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), 'Cana!@#123').toString();
+            const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(access_token), 'Cana!@#123').toString();
+            this.setTokenAndUser(encryptedUser,encryptedToken);
             window.location.reload();
           } else {
             // Failed login
@@ -63,21 +50,19 @@ export const useAuthStore = defineStore(
     getters: {
       getUser() {
         const data = JSON.parse(localStorage.getItem('user'))
-        const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), 'secret key 123').toString();
-        const bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+        const bytes  = CryptoJS.AES.decrypt(data, 'Cana!@#123');
         const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        console.log(decryptedData); // [{id: 1}, {id: 2}]
         return decryptedData
       },
       getToken() {
-        const encryptedToken = localStorage.getItem('token')
-        if(encryptedToken){
-          const decryptedToken = CryptoJS.AES.decrypt(encryptedToken, '123').toString(CryptoJS.enc.Utf8)
-          return decryptedToken
+        const data = JSON.parse(localStorage.getItem('token'))
+        if(data){
+          const bytes = CryptoJS.AES.decrypt(data, "Cana!@#123")
+          const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
+          return decryptedData.token
         }
         return null
       },
-      
     }
   }
 )

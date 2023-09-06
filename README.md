@@ -46,3 +46,9 @@ dependency to your project.
 ```sh
 npm install crypto-js
 ```
+dependency to your project.
+```sh
+npm install @fortawesome/fontawesome-free -D
+```
+
+
