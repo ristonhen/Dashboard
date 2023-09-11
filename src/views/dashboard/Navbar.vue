@@ -1,61 +1,31 @@
 <template>
-  <v-list density="compact" nav>
-    <v-list-group v-for="(item, index) in menuItems" :key="index" :value="item.pms_menu_name">
-      <template v-slot:activator="{ props }">
-        <v-list-item
-          v-bind="props"
-          :prepend-icon="item.pms_menu_image"
-          :title="item.pms_menu_name"
-        ></v-list-item>
-      </template>
-
-      <v-list-group v-for="(submenu, i) in item.submenus" :key="i" :value="submenu.pms_menu_name">
-        <template v-slot:activator="{ props }">
-          <v-list-item v-bind="props" :title="submenu.pms_menu_name"></v-list-item>
-        </template>
-
-        <v-list-group v-for="(childsubitem, j) in submenu.submenus" :key="j" :value="childsubitem.title">
-          <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" :title="childsubitem.pms_menu_name"></v-list-item>
-          </template>
-
-          <v-list-item
-            v-for="(itemss, k) in childsubitem.submenus"
-            :key="k"
-            :title="itemss.pms_menu_name"
-            :prepend-icon="itemss.icon"
-            :value="itemss.title"
-          ></v-list-item>
-        </v-list-group>
-      </v-list-group>
-    </v-list-group>
-  </v-list>
+  <div>
+    <RecursiveComponent :submenus="menuItems" />
+  </div>
 </template>
 <script>
 import { useAuthStore } from '@/store/authStore'
+import RecursiveMenu from '@/components/RecursiveMenu.vue'
 import  axios  from 'axios'
-import { onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue'
 export default {
   name: 'Navbar',
+  components: {
+    RecursiveMenu
+  },
   data: () => ({ 
     menuItems: [], 
   }),
   methods:{
-    getUser(){
-      const data = JSON.parse(localStorage.getItem('user'))
-      const bytes  = CryptoJS.AES.decrypt(data, 'Cana!@#123');
-      const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-      return decryptedData
-    },
-    async fetchData(){
+    async getMenu(){
       const authStore = useAuthStore()
       const baseUrl = `${import.meta.env.VITE_API_URL}/menu/getmenuassignedrole`
-      const token = authStore.getToken
+      const { getToken } = authStore
       try {
-        if (token ){
+        if (getToken ){
           const res = await axios.get(baseUrl,
             {
-              headers: { 'Content-Type': 'application/json',Authorization: `Bearer ${token}` },
+              headers: { 'Content-Type': 'application/json',Authorization: `Bearer ${getToken}` },
             })
           const response = res.data;
           if (response.status === true) {
@@ -87,7 +57,7 @@ export default {
               pms_menu_index: menuItem.pms_menu_index,
               submenus: generateSubMenu(this.menuItems, menuItem.pmsid),
             }));
-          console.log(this.menuItems)
+          // console.log(this.menuItems)
           } else {
             console.log('Failed to retrieve menu items');
           }
@@ -103,10 +73,7 @@ export default {
     }
   },
   mounted(){
-    this.fetchData()
-    // this.getUser()
-    console.log(import.meta.env.VITE_SOME_KEY) // 123
-    console.log(import.meta.env.NEW_KEY1) // undefined
+    this.getMenu()
   }
 }
 </script>

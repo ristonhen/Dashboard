@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
-import CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js'
 const baseUrl = `${import.meta.env.VITE_API_URL}/login`;
+const depass = `${import.meta.env.VITE_DEPASS}`;
 export const useAuthStore = defineStore(
   'auth', 
   {
@@ -34,8 +35,8 @@ export const useAuthStore = defineStore(
           })
           if (response.status === 200 ) {
             const { user, access_token } = response.data
-            const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), 'Cana!@#123').toString();
-            const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(access_token), 'Cana!@#123').toString();
+            const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), depass).toString();
+            const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(access_token), depass).toString();
             this.setTokenAndUser(encryptedUser,encryptedToken);
             window.location.reload();
           } else {
@@ -50,14 +51,14 @@ export const useAuthStore = defineStore(
     getters: {
       getUser() {
         const data = JSON.parse(localStorage.getItem('user'))
-        const bytes  = CryptoJS.AES.decrypt(data, 'Cana!@#123');
+        const bytes  = CryptoJS.AES.decrypt(data, depass);
         const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
         return decryptedData
       },
       getToken() {
         const data = JSON.parse(localStorage.getItem('token'))
         if(data){
-          const bytes = CryptoJS.AES.decrypt(data, "Cana!@#123")
+          const bytes = CryptoJS.AES.decrypt(data, depass)
           const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
           return decryptedData.token
         }
