@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <RecursiveComponent :submenus="menuItems" />
-  </div>
+    <RecursiveMenu :menuItems="menuItems"></RecursiveMenu>
 </template>
 <script>
 import { useAuthStore } from '@/store/authStore'
