@@ -5,7 +5,6 @@
 import { useAuthStore } from '@/store/authStore'
 import RecursiveMenu from '@/components/RecursiveMenu.vue'
 import  axios  from 'axios'
-import { onMounted, ref } from 'vue'
 export default {
   name: 'Navbar',
   components: {

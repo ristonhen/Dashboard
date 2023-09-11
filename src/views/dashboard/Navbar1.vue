@@ -1,5 +1,5 @@
 <template>
-  <v-list density="compact" nav>
+  <v-list density="compact" >
     <div v-for="(item,index) in menu" :key="index"
       style="padding: 2px 0;"
     > 

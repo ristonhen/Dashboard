@@ -33,12 +33,10 @@
   </v-app>
 </template>
 <script>
-  import { useAuthStore } from '@/store/authStore'
   import { onMounted } from 'vue'
   import Navbar from './dashboard/Navbar.vue'
   import Headers from './dashboard/Headers.vue'
   import Container from './dashboard/Container.vue'
-  import { storeToRefs } from 'pinia'
   export default {
     name: 'Home',
     components: { Navbar, Headers , Container },
@@ -60,15 +58,9 @@
       
     },
     setup() {
-      const useStore = useAuthStore();
-      const user = useStore.getUser;
       onMounted(() => {
         // console.log(user); // Log the user object to the console after component is mounted
       });
-
-      return {
-        user,
-      };
     },
   }
 </script>
@@ -78,7 +70,7 @@
     overflow-y: auto
     overflow-x: hidden !important
     &::-webkit-scrollbar
-      width: 7px                             
+      width: 3px                             
     &::-webkit-scrollbar-thumb
       padding-right: 2px
       background: black                                 

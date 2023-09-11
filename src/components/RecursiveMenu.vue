@@ -10,7 +10,7 @@
           ></v-list-item>
         </template>
         <template v-slot:default>
-          <RecursiveMenu :menuItems="item.submenus"></RecursiveMenu>
+          <RecursiveMenu :menuItems="item.submenus" class="pa-0 ma-0"></RecursiveMenu>
         </template>
       </v-list-group>
       <v-list-item 
