@@ -4,13 +4,20 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
 import NotFound from '@/layouts/NotFound.vue'
 import HomeVue from '@/views/Home.vue'
 import DashboardVue from "@/views/menu/Dashboard.vue"
-import ManageUserVue from "@/views/menu/ManageUser.vue"
-import AdministratorToolsVue from "@/views/menu/AdministratorTools.vue"
-import AboutVue from "@/views/menu/About.vue"
-import ConfigurationVue from "@/views/menu/Configuration.vue"
-import ReportVue from "@/views/menu/Report.vue"
-import TeamVue from "@/views/menu/Team.vue"
+
 import { useAuthStore } from '@/store/authStore'
+
+var r=[]
+if (localStorage.getItem('r_')) {
+  const parsedR = JSON.parse(localStorage.getItem('r_'));
+    
+  r = parsedR.map((route) => ({
+      path: `${route.name}`,
+      name: `${route.path}`,
+      component: () => import(`@/views/menu/${route.name}.vue`),
+      props: true,
+  }));
+} 
 const routes = [
   {
     path: '/:catchAll(.*)',
@@ -26,9 +33,6 @@ const routes = [
         path: '',
         name: 'Home',
         component: HomeVue,
-        meta: {
-          requiresAuth: true
-        },
         children: [
           {
             path: '',
@@ -43,73 +47,10 @@ const routes = [
               requiresAuth: true
             }
           },
-          {
-            path: '/User',
-            name: 'User_&_Permission',
-            props: true,
-            component: BlankLayout,
-            children: [
-              {
-                path: '/User/:id',
-                name: 'User',
-                component: ManageUserVue,
-              }
-            ]
-          },
-          {
-            path: '/Administrator',
-            name: 'Administrator',
-            props: true,
-            component: BlankLayout,
-            children: [
-              {
-                path: '/Administrator/:id',
-                name: 'Admin',
-                component: AdministratorToolsVue,
-              }
-            ]
-          },
-          {
-            path: '/about',
-            name: 'About',
-            props: true,
-            component: AboutVue,
-          },
-          {
-            path: '/Configuration',
-            name: 'Configuration',
-            props: true,
-            component: ConfigurationVue
-          },
-          
-          {
-            path: '/Configuration',
-            name: 'Configuration',
-            props: true,
-            component: ConfigurationVue
-          },
-          {
-            path: '/report',
-            name: 'Report',
-            props: true,
-            component: ReportVue
-          },
-          {
-            path: '/Team',
-            name: 'Team',
-            props: true,
-            component: TeamVue
-          },
-          {
-            path: '/test',
-            name: 'test',
-            props: true,
-            component: () => import('../views/menu/test.vue')
-          },
-          
-        ]
+          ...r],
       }
-    ]
+    ],
+    
   },
   {
     path: '',
@@ -119,7 +60,7 @@ const routes = [
       {
         path: '/login',
         name: 'Login',
-        component: () => import('../views/auth/Login.vue'),
+        component: () => import('@/views/auth/Login.vue'),
         meta: {
           requiresNoAuth: true
         }
@@ -127,6 +68,7 @@ const routes = [
     ]
   }
 ]
+
 const router = createRouter({
   history: createWebHistory(),
   routes,
@@ -153,6 +95,7 @@ router.beforeEach((to, from, next) => {
     next();
   }
   // Set the document title based on the name of the current route
-  document.title = to.name + ' - APP';
+  // document.title = to.name + ' - APP';
+  document.title = 'APP';
 });
 export default router

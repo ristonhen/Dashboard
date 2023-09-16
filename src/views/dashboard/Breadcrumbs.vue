@@ -1,13 +1,13 @@
 <template>
   <div class="d-flex justify-space-between align-center">
-    <span class="text-uppercase font-weight-medium" >{{ items[1].title }}</span>
+    <span class="text-uppercase font-weight-medium" >{{ breadcrumbs[1].text }}</span>
     <!-- Breadcrums -->
     <v-breadcrumbs 
-      :items="items" 
+      :items="breadcrumbs" 
       divider="/"
     >
       <template v-slot:title="{ item }">
-        <span>{{ item.title }}</span>
+        <span>{{ item.text }}</span>
       </template>
     </v-breadcrumbs>
   </div>
@@ -18,6 +18,7 @@ export default {
   data(){
     return {
       items:[],
+      breadcrumbs: [],
     }
   },
   methods: {
@@ -36,7 +37,31 @@ export default {
           this.items[1].disabled = false
         }
       }
-    },  
+    }, 
+    generateBreadcrumbs(path) {
+      if (typeof path !== 'string') {
+        console.error('Path must be a string.');
+        return;
+      }
+
+      const segments = path.split('/').filter(Boolean);
+      let currentPath = '';
+      this.breadcrumbs = [
+        {
+          text: 'Home',
+          to: '/',
+          disabled: false,
+        },
+        ...segments.map((segment, index) => {
+          currentPath += `/${segment}`;
+          return {
+            text: segment,
+            to: currentPath,
+            disabled: true,
+          };
+        }),
+      ];
+    }, 
   },
   computed: {
     userId() {
@@ -45,12 +70,15 @@ export default {
   },
   watch:{
     $route(){
-      this.getRoute() // console.log(this.$route.name); // console.log(this.items[1]);
+      // this.getRoute() // console.log(this.$route.name); // console.log(this.items[1]);
+      // console.log(this.$route.matched[2].name)
+      this.generateBreadcrumbs(this.$route.name)
     }
   },
   created(){
-    this.getRoute()
-  }
+    // this.getRoute()
+    this.generateBreadcrumbs(this.$route.name);
+  },
 }
 </script>
 <style scoped>

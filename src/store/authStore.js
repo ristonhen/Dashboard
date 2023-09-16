@@ -13,6 +13,10 @@ export const useAuthStore = defineStore(
       name: 'risto',
     }),
     actions: {
+      setRoute(r){
+        localStorage.setItem('r_', r);
+      },
+      
       setTokenAndUser(user,token) {
         this.user = user
         this.token = token;
@@ -39,12 +43,16 @@ export const useAuthStore = defineStore(
             const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(access_token), depass).toString();
             this.setTokenAndUser(encryptedUser,encryptedToken);
             window.location.reload();
+            // this.$router.push('/Dashboard')
+            return true
           } else {
             // Failed login
             this.isAuthenticated = false;
+            return false
           }
         } catch (error) {
           console.log(error.response);
+          return false
         }
       }
     },
@@ -64,6 +72,9 @@ export const useAuthStore = defineStore(
         }
         return null
       },
+      getRoute(){
+        return localStorage.getItem('r_')
+      }
     }
   }
 )

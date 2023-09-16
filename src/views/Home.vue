@@ -4,27 +4,33 @@
     <v-navigation-drawer 
       v-model="drawer"
       :rail="rail"
-      style="position:fixed"
+      
       expand-on-hover
     >
-      <v-list-item
-        lines="two"
-        prepend-avatar="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
-        nav
-      >
-        <template v-slot:append>
-          <v-icon
-            variant="text"
-            icon="mdi-chevron-left"
-            @click.stop="rail = !rail"
-          />
-        </template>
-        <v-list-item-title class="font-weight-black text-body-2">{{ app.apptitle }}</v-list-item-title>
-      </v-list-item>
-      <v-divider />
+      <div class="sticky-top">
+        <v-list-item
+          lines="two"
+          :prepend-avatar="app.logo"
+          nav
+          
+        >
+          <template v-slot:append>
+            <v-icon
+              variant="text"
+              icon="mdi-dots-vertical"
+              @click.stop="rail = !rail"
+            />
+          </template>
+          <v-list-item-title class="font-weight-black text-body-2">{{ app.apptitle }}</v-list-item-title>
+        </v-list-item>
+        <v-divider />
+      </div>
       <!-- NavBAr -->
       <!--  -->
-      <Navbar/>
+      <!-- <div style="overflow-y: auto; max-height: calc(100vh - 64px);"> -->
+      <div class="custom-scrollbar">
+        <Navbar />
+      </div>
     </v-navigation-drawer>
     <!-- HEADER BAR -->
     <Headers :drawer="drawer" @toggleDrawer="toggleDrawer"/>
@@ -42,9 +48,8 @@
     components: { Navbar, Headers , Container },
     data: () => ({ 
       manageApp: [
-        { apptitle: 'App Admin', logo: '../assets/img/app-logo.png'} 
+        { apptitle: 'App Admin', logo: '../assets/canalogo.webp'} 
       ],
-      token: null,
       drawer: true,
       rail: false, 
     }),
@@ -66,14 +71,32 @@
 </script>
 <style lang="sass">
   .v-navigation-drawer__content
+    overflow: hidden !important
+
+  .sticky-top
+    position: sticky
+    top: 0
+    background-color: white // Optional: Set a background color if desired
+    z-index: 1
+
+  .custom-scrollbar
     height: 100%
-    overflow-y: auto
     overflow-x: hidden !important
+
     &::-webkit-scrollbar
-      width: 3px                             
+      width: 0px
+      transition: width 0.3s
+
     &::-webkit-scrollbar-thumb
       padding-right: 2px
-      background: black                                 
-      border-radius: 20px
       background: gray
+      border-radius: 15px
+      transition: background-color 0.3s
+
+    &::-webkit-scrollbar-thumb:hover
+      background: black
+
+  .custom-scrollbar:not(:hover)::-webkit-scrollbar
+    width: 0
+  
 </style>

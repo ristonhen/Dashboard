@@ -84,10 +84,9 @@ export default {
     ],
   }),
   methods:{
-    async submitHandler(){
+    submitHandler(){
       const useStore = useAuthStore();
-      await useStore.submitHandler(this.username,this.password)
-      this.$router.push('/')
+      useStore.submitHandler(this.username,this.password)
     }
     
   },
