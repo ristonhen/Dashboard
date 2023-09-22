@@ -4,6 +4,7 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
 import NotFound from '@/layouts/NotFound.vue'
 import HomeVue from '@/views/Home.vue'
 import DashboardVue from "@/views/menu/Dashboard.vue"
+import Test from "@/views/menu/Test.vue"
 
 import { useAuthStore } from '@/store/authStore'
 
@@ -43,6 +44,14 @@ const routes = [
             path: '/Dashboard',
             name: 'Dashboard',
             component: DashboardVue,
+            meta: {
+              requiresAuth: true
+            }
+          },
+          {
+            path: '/test',
+            name: 'test',
+            component: Test,
             meta: {
               requiresAuth: true
             }

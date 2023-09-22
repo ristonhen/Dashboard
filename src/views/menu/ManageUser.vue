@@ -245,15 +245,6 @@
             branch: 'Head Office',
             glutenfree: false,
           },
-          // {
-          //   name: 'Ice cream sandwich',
-          //   calories: 237,
-          //   fat: 9.0,
-          //   carbs: 37,
-          //   protein: 4.3,
-          //   glutenfree: false,
-          // },
-
 
         ]
       },
