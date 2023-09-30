@@ -10,7 +10,6 @@ export const useAuthStore = defineStore(
       isAuthenticated: false,
       token: null,
       user: null,
-      name: 'risto',
     }),
     actions: {
       setRoute(r){
@@ -20,8 +19,8 @@ export const useAuthStore = defineStore(
       setTokenAndUser(user,token) {
         this.user = user
         this.token = token;
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('token', JSON.stringify(token));
+        localStorage.setItem('user', JSON.stringify(user))
+        localStorage.setItem('token', JSON.stringify(token))
       },
       
       logout() {
@@ -40,9 +39,9 @@ export const useAuthStore = defineStore(
           if (response.status === 200 ) {
             const { user, access_token } = response.data
             const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), depass).toString();
-            const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(access_token), depass).toString();
-            this.setTokenAndUser(encryptedUser,encryptedToken);
-            window.location.reload();
+            const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(access_token), depass).toString()
+            this.setTokenAndUser(encryptedUser,encryptedToken)
+            window.location.reload()
             // this.$router.push('/Dashboard')
             return true
           } else {

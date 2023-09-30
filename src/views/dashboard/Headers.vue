@@ -4,7 +4,7 @@
       color="blue-grey-lighten-5"
   >
     <v-app-bar-nav-icon @click="toggleDrawer"/>
-
+    <v-spacer></v-spacer>
     <v-row align="center">
       <v-col cols="auto">
         <v-text-field
