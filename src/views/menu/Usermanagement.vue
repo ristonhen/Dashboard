@@ -52,10 +52,12 @@ export default {
   components:{ ModalDialog },
   data(){
     return {
+      branchData: [],
       enteredUserData: null,
       dialogVisible: false,
       dialogTitle: 'ADD USER',
       dialogAction: 'Add',
+      messsage: null,
        search: '',
         headers: [
           { align: 'start', key: 'user_id', sortable: false, title: 'ID'},
@@ -82,8 +84,8 @@ export default {
         roleid: '',
         phone_number: '',
         description: '',
-        branch_id: '1',
-        roleid: '2',
+        branch_id: '',
+        roleid: '',
         
       }
     }
@@ -134,7 +136,15 @@ export default {
           label: 'Branch name',
           required: true,
           variant: "outlined",
-          items: ['Administrator', 'Super Administrator', 'Supervisor', 'Counter','Supervisor HO','Reporter'],
+          items: this.branchData.map(branch => 
+          (
+            {
+            branch_id: branch.branch_id,
+            branch_name: branch.branch_name
+            }
+          )
+          // branch.branch_id
+          ),
           rules: [
             v => !!v || 'Branch name is required',
           ]
@@ -175,6 +185,27 @@ export default {
     },
   },
   methods:{
+    async getBranch(){
+      const authStore = useAuthStore();
+      const baseUrl = `${import.meta.env.VITE_API_URL}/branch`
+      const token = await authStore.getToken
+      try {
+        const respone = await axios.get(baseUrl,{
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+        })
+        if(respone.status == 200){
+          this.branchData = respone.data
+          console.log(this.branchData.map(branch => ({
+            value: branch.branch_id,
+            text: branch.branch_name
+          })))
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+        return null
+      }
+
+    },
     async getUser(){
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/users`
@@ -203,30 +234,30 @@ export default {
       const baseUrl = `${import.meta.env.VITE_API_URL}/users`
       const authStore = useAuthStore()
       const token = authStore.getToken
+      console.log({...this.newUser})
+      // try {
+      //   this.newUser.email = this.newUser.email + "@gmail.com"
+      //   const response = await axios.post(baseUrl, this.newUser, {
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   })
+      //   if(response.status == 201){
+      //     // this.users.push({ ...this.newUser })
+      //     // this.users.push({ ...this.newUser })
+      //     this.users.push( response.data )
 
-      try {
-        this.newUser.email = this.newUser.email + "@gmail.com"
-        const response = await axios.post(baseUrl, this.newUser, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        // const modified_by = authStore.getUser.email
-        if(response.status == 201){
-          // this.users.push({ ...this.newUser })
-          // this.users.push({ ...this.newUser })
-          this.users.push( response.data )
-          this.enteredUserData = response.data
-        }
-      } catch (error) {
-        console.error('Error adding user:', error);
-      }
-      
+      //   }
+      //   this.enteredUserData = { ...this.newUser }
+      // } catch (error) {
+      //   console.error('Error adding user:', error);
+      // }
     },
   },
   mounted(){
     this.getUser()
+    this.getBranch()
   }
   
 }

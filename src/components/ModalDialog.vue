@@ -5,6 +5,13 @@
       <v-card-text>
         <v-form ref="form">
           <v-row>
+             <v-select
+                v-model="selectedBranch"
+                :items="branchData"
+                label="Branch Name"
+                required
+                outlined
+              ></v-select>
             <v-col v-for="(field, index) in formFields" :key="index" cols="6" sm="6">
               <template v-if="field.component === 'v-radio-group'">
                 <v-radio-group v-model="formData[field.name]" :label="field.label || field.name" :required="field.required" inline>
@@ -24,6 +31,7 @@
                   v-model="formData[field.name]"
                   :label="field.label"
                   :items="field.items"
+                  item-title="name"
                   :required="field.required"
                   :variant="field.variant"
                   :rules="field.rules"
@@ -133,6 +141,18 @@ export default {
       dialogVisible: false,
       validationErrors: {},
       successMessageVisible: false,
+      selectedBranch: null,
+      branchData: [
+        {
+          value: 1,
+          text: "TNM KP"
+        },
+        {
+          value: 2,
+          text: "TNM KPS"
+        },
+        // Add the remaining objects as per your data
+      ]
     }
   },
   watch: {
