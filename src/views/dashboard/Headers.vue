@@ -11,14 +11,18 @@
           :loading="loading"
           variant="solo"
           v-model="search"
-          append-inner-icon="mdi-magnify"
+          append-inner-icon="mdi-microphone"
+          prepend-inner-icon="mdi-magnify"
+          placeholder="Search Google or type a URL"
           label="Search"
           single-line
           hide-details
+          theme="light"
+          rounded
+          density="comfortable"
           @click:append-inner="onClick"
-          class="custom-text-field "
+          class="custom-text-field"
         ></v-text-field>
-        
       </v-col>
       <v-spacer></v-spacer>
       <v-col cols="auto" justify="end">

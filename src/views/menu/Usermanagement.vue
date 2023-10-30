@@ -1,6 +1,10 @@
 <template>
   <v-card>
     <v-card-title class="d-flex justify-end align-center">
+      <v-btn color="blue-grey-darken-3" @click="openDialog" icon>
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+      <v-spacer></v-spacer>
       <v-text-field
           :loading="loading"
           variant="solo"
@@ -12,9 +16,7 @@
           @click:append-inner="onClick"
           class="custom-text-field pr-4"
         ></v-text-field>
-      <v-btn color="blue-grey-darken-3" @click="openDialog" icon>
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
+      
     </v-card-title>
     <v-data-table
       :headers="headers"
@@ -53,6 +55,7 @@ export default {
   data(){
     return {
       branchData: [],
+      roleData: [],
       enteredUserData: null,
       dialogVisible: false,
       dialogTitle: 'ADD USER',
@@ -85,7 +88,7 @@ export default {
         phone_number: '',
         description: '',
         branch_id: '',
-        roleid: '',
+        roleid: '1',
         
       }
     }
@@ -120,7 +123,7 @@ export default {
         {
           name: 'email',
           component: 'v-text-field',
-          label: 'User Name',
+          label: 'Email',
           required: true,
           variant: "outlined",
           rules: [
@@ -131,7 +134,7 @@ export default {
           ]
         },
         {
-          name: 'branch_name',
+          name: 'branch_id',
           component: 'v-select',
           label: 'Branch name',
           required: true,
@@ -139,8 +142,8 @@ export default {
           items: this.branchData.map(branch => 
           (
             {
-            branch_id: branch.branch_id,
-            branch_name: branch.branch_name
+            value: branch.id,
+            title: branch.branch_name
             }
           )
           // branch.branch_id
@@ -160,12 +163,19 @@ export default {
           ],
         },
         {
-          name: 'rolename',
+          name: 'roleid',
           component: 'v-select',
           label: 'Role Name',
           required: true,
           variant: 'outlined',
-          items: ['Administrator', 'Super Administrator', 'Supervisor', 'Counter','Supervisor HO','Reporter'],
+          items: this.roleData.map(role => 
+          (
+            {
+            value: role.id,
+            title: role.rolename
+            }
+          )
+          ),
           rules: [
             v => !!v || 'Role Name is required',
           ],
@@ -185,6 +195,29 @@ export default {
     },
   },
   methods:{
+    async getRole(){
+      const authStore = useAuthStore();
+      const baseUrl = `${import.meta.env.VITE_API_URL}/role`
+      const token = await authStore.getToken
+      try {
+        const respone = await axios.get(baseUrl,{
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+        })
+        
+        if(respone.data.status == true){
+          this.roleData = respone.data.data
+          
+          // console.log(this.branchData.map(branch => ({
+          //   branch_id: branch.branch_id,
+          //   branch_name: branch.branch_name
+          // })))
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+        return null
+      }
+
+    },
     async getBranch(){
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/branch`
@@ -195,10 +228,10 @@ export default {
         })
         if(respone.status == 200){
           this.branchData = respone.data
-          console.log(this.branchData.map(branch => ({
-            value: branch.branch_id,
-            text: branch.branch_name
-          })))
+          // console.log(this.branchData.map(branch => ({
+          //   branch_id: branch.branch_id,
+          //   branch_name: branch.branch_name
+          // })))
         }
       } catch (error) {
         console.error('Error fetching user data:', error)
@@ -216,7 +249,6 @@ export default {
         })
         if(respone.data.status === true){
           this.users = respone.data.users
-          // console.log(this.users)
         }
       } catch (error) {
         console.error('Error fetching user data:', error)
@@ -224,7 +256,6 @@ export default {
     },
     openDialog() {
       this.dialogVisible = true;
-      console.log(this.dialogVisible)
     },
     closeDialog() {
       this.dialogVisible = false;
@@ -235,29 +266,30 @@ export default {
       const authStore = useAuthStore()
       const token = authStore.getToken
       console.log({...this.newUser})
-      // try {
-      //   this.newUser.email = this.newUser.email + "@gmail.com"
-      //   const response = await axios.post(baseUrl, this.newUser, {
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //   })
-      //   if(response.status == 201){
-      //     // this.users.push({ ...this.newUser })
-      //     // this.users.push({ ...this.newUser })
-      //     this.users.push( response.data )
+      try {
+        this.newUser.email = this.newUser.email + "@gmail.com"
+        const response = await axios.post(baseUrl, this.newUser, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        if(response.status == 201){
+          // this.users.push({ ...this.newUser })
+          // this.users.push({ ...this.newUser })
+          this.users.push( response.data )
 
-      //   }
-      //   this.enteredUserData = { ...this.newUser }
-      // } catch (error) {
-      //   console.error('Error adding user:', error);
-      // }
+        }
+        this.enteredUserData = { ...this.newUser }
+      } catch (error) {
+        console.error('Error adding user:', error);
+      }
     },
   },
   mounted(){
     this.getUser()
     this.getBranch()
+    this.getRole()
   }
   
 }

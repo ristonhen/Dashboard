@@ -5,13 +5,6 @@
       <v-card-text>
         <v-form ref="form">
           <v-row>
-             <v-select
-                v-model="selectedBranch"
-                :items="branchData"
-                label="Branch Name"
-                required
-                outlined
-              ></v-select>
             <v-col v-for="(field, index) in formFields" :key="index" cols="6" sm="6">
               <template v-if="field.component === 'v-radio-group'">
                 <v-radio-group v-model="formData[field.name]" :label="field.label || field.name" :required="field.required" inline>
@@ -31,7 +24,8 @@
                   v-model="formData[field.name]"
                   :label="field.label"
                   :items="field.items"
-                  item-title="name"
+                  :item-title="field.items.title"
+                  :item-value="field.items.value"
                   :required="field.required"
                   :variant="field.variant"
                   :rules="field.rules"
@@ -102,7 +96,7 @@
         >{{ dialogAction }}</v-btn>
       </v-card-actions>
     </v-card>
-    <v-snackbar v-model="successMessageVisible" :timeout="10000" color="success">Form submitted successfully.</v-snackbar>
+    <v-snackbar v-model="successMessageVisible" :timeout="1000" color="success">Form submitted successfully.</v-snackbar>
   </v-dialog>
 </template>
 <script>
@@ -136,8 +130,6 @@ export default {
   },
   data() {
     return {
-      ex7: 'red',
-      ex8: 'primary',
       dialogVisible: false,
       validationErrors: {},
       successMessageVisible: false,
