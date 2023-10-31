@@ -88,8 +88,8 @@
             <v-list>
               <v-list-item
                 prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
-                title="Risto Nhen"
-                subtitle="ristonhen@gmail.com"
+                :title="getUser.fullname"
+                :subtitle="getUser.email"
               >
                 <template v-slot:append>
                   <!-- :class="fav ? 'text-red' : ''" , @click="fav = !fav" -->
@@ -134,7 +134,7 @@
               <v-btn
                 color="red-darken-4"
                 variant="text"
-                @click="authStore.logout"
+                @click="logout"
               >
                 LOG OUT
                 <v-icon icon="mdi-logout" class="ps-4"></v-icon>
@@ -222,17 +222,14 @@ export default {
       }
     },
   },
+  mounted(){
+  },
   setup() {
-    const authStore = useAuthStore() // use the auth store in the component
-    // const useStore  = useAuthStore
-    // define the logout function
-    // const logout = () => {
-    //   console.log(authStore.user) // dispatch a logout action to the store
-    // };
-
+    const authStore = useAuthStore()
+    const logout = authStore.logout
+    const getUser = authStore.getUser
     return {
-      // logout,
-      authStore
+      logout,getUser
     }
   },
 }
