@@ -147,7 +147,7 @@
   </v-app-bar>
 </template>
 <script>
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/authStore'
 export default {
   props: [ 'drawer' ],
   data(){

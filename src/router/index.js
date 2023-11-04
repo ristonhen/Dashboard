@@ -5,6 +5,7 @@ import NotFound from '@/layouts/NotFound.vue'
 import HomeVue from '@/views/Home.vue'
 import DashboardVue from "@/views/menu/Dashboard.vue"
 import Test from "@/views/menu/Test.vue"
+import Utest from "@/views/menu/ManageUser.vue"
 import Search from '@/components/Search.vue'
 
 import { useAuthStore } from '@/store/authStore'
@@ -52,7 +53,7 @@ const routes = [
           {
             path: '/test',
             name: 'test',
-            component: Test,
+            component: Utest,
             meta: {
               requiresAuth: true
             }

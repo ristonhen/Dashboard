@@ -1,7 +1,7 @@
 <template>
-  <v-dialog v-model="dialogVisible" max-width="600px">
+  <v-dialog v-model="dialogVisible" max-width="600px" >
     <v-card>
-      <v-card-title class="custom-card-title">{{ dialogTitle }}</v-card-title>
+      <v-card-title class="bg-blue-grey-darken-2">{{ dialogTitle }}</v-card-title>
       <v-card-text>
         <v-form ref="form">
           <v-row>
@@ -29,6 +29,7 @@
                   :required="field.required"
                   :variant="field.variant"
                   :rules="field.rules"
+                  density="comfortable"
                 ></v-select>
               </template>
               <template v-else-if="field.component === 'v-combobox'">
@@ -40,6 +41,7 @@
                   :variant="field.variant"
                   :rules="field.rules"
                   :error-messages="validationErrors[field.name]"
+                  density="comfortable"
                   @input="clearValidationError(field.name)"
                 ></v-combobox>
               </template>
@@ -49,6 +51,7 @@
                   :label="field.label"
                   :required="field.required"
                   :rules="field.rules"
+                  density="comfortable"
                   :error-messages="validationErrors[field.name]"
                   @input="clearValidationError(field.name)"
                 ></v-checkbox>
@@ -61,6 +64,7 @@
                   :required="field.required"
                   :variant="field.variant"
                   :rules="field.rules"
+                  density="comfortable"
                   :error-messages="validationErrors[field.name]"
                   @input="clearValidationError(field.name)"
                 ></v-autocomplete>
@@ -73,6 +77,7 @@
                   :required="field.required"
                   :variant="field.variant"
                   :rules="field.rules"
+                  density="comfortable"
                   :error-messages="validationErrors[field.name]"
                   @input="clearValidationError(field.name)"
                 ></component>
@@ -98,6 +103,7 @@
     </v-card>
     <v-snackbar v-model="successMessageVisible" :timeout="1000" color="success">Form submitted successfully.</v-snackbar>
   </v-dialog>
+  
 </template>
 <script>
 export default {
@@ -249,9 +255,5 @@ export default {
   position: absolute;
   top: 0px;
   right: 0px;
-}
-.custom-card-title {
-  background-color: rgb(7, 10, 171);
-  color: white;
 }
 </style>
