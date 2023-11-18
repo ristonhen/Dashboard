@@ -18,7 +18,6 @@ export default {
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/menu/getmenuassignedrole`;
       const { getToken } = authStore;
-
       try {
         if (getToken) {
           const res = await axios.get(baseUrl, {

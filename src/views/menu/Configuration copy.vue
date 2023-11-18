@@ -5,7 +5,7 @@
         <v-icon>mdi-plus</v-icon>
       </v-btn>
       <v-sheet class="ps-1" v-if="selected.length > 0">
-        <v-btn color="red-darken-4" icon @click="deleteItem()">
+        <v-btn color="red-darken-4" icon @click="deleteItem">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
         
@@ -29,49 +29,27 @@
     <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="branchData"
+      :items="configData"
       :search="search"
       show-select
       return-object
       items-per-page="15"
       class="elevation-1 custom-datatable"
-      hover
     >
-      <template v-slot:[`item.branch_code`]="{ item }">
-        <span>{{ item.branch_code }}</span>
-        <v-spacer></v-spacer>
+      <template v-slot:[`item.paramname`]="{ item }">
+        <span>{{ item.paramname }}</span>
         <v-icon size="small" class="me-2" @click="editItem(item)">
           mdi-pencil
         </v-icon>
         <v-icon size="small" color="error" @click="deleteItem(item)"> mdi-delete </v-icon>
       </template>
-
-      <!-- <template v-slot:item="{ item }">
-        <tr :class="{ 'row-hovered': hoveredRow === item }" @mouseover="hoveredRow = item" @mouseleave="hoveredRow = null">
-          <template v-for="header in headers" :key="header.key">
-            <td>
-              {{ item[header.key] }}
-            </td>
-          </template>
-          <td>
-            <template v-if="hoveredRow === item">
-              <v-btn icon small class="mr-2" @click="editItem(item)">
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn icon small color="error" @click="deleteItem(item)">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </template>
-          </td>
-        </tr>
-      </template> -->
     </v-data-table>
     <ModalDialog
       v-model="dialogVisible"
       :toggleVisible="dialogVisible"
       :dialog-title="dialogTitle"
       :dialog-action="dialogAction"
-      :form-data="newbranch"
+      :form-data="newConfig"
       :form-fields="formFields"
       @closeDialog="closeDialog"
       @submit-form="submitForm"
@@ -83,12 +61,12 @@
      >
       <v-card>
         <v-card-title class="text-h5">
-          Delete branch
+          Delete Configuration
         </v-card-title>
         <v-card-text>Are you sure you want to delete this item?</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green-darken-1" variant="text" @click="dialogDelete = false" > Close </v-btn>
+          <v-btn color="green-darken-1" variant="text" @click="dialogDelete = false" > Cancel </v-btn>
           <v-btn color="green-darken-1" variant="text" @click="deleteItemConfirm" >Ok</v-btn>
         </v-card-actions>
       </v-card>
@@ -98,15 +76,16 @@
   <v-snackbar v-model="successMessageVisible" :timeout="1000" color="success" class="snackbar-bottom-right">
     Form {{messageText}} successfully.
   </v-snackbar>
+  
 </template>
 <script>
 import axios from 'axios'
 import { useAuthStore } from '@/store/authStore'
 import ModalDialog from '@/components/ModalDialog.vue'
-const baseUrl = `${import.meta.env.VITE_API_URL}/branch`
+const baseUrl = `${import.meta.env.VITE_API_URL}/configuration`
 const authStore = useAuthStore()
 export default {
-  name: 'branch',
+  name: 'Configuration',
   components:{ ModalDialog },
   data(){
     return {
@@ -114,96 +93,60 @@ export default {
       dialogDelete: false,
       editedIndex: -1,
       dialogVisible: false,
+      // dialogTitle: 'ADD USER',
       dialogAction: 'Add',
       search: '',
       headers: [
-        // { align: 'start', key: 'id', sortable: false, title: 'NO'},
-        { branch_code: 'branch_code', title: 'branch_code',key: 'branch_code' },
-        { branchcode: 'branch_name', title: 'branch_name',key: 'branch_name' },
-        { range_ip: 'range_ip', title: 'range_ip' ,key: 'range_ip'},
+        { align: 'start', key: 'id', sortable: false, title: 'NO'},
+        { paramname: 'paramname', title: 'paramname',key: 'paramname' },
+        { value: 'value', title: 'value',key: 'value' },
         { created_by: 'created_by', title: 'created_by' ,key: 'created_by'},
         { created_date: 'created_date', title: 'created_date',key: 'created_date' },
         { modified_by: 'iron', title: 'modified_by',key: 'modified_by' },
         { modified_date: 'iron', title: 'modified_date',key: 'modified_date' },
-        { company_id: 'company_id', title: 'company_id',key: 'company_id' },
-        { opening_date: 'opening_date', title: 'opening_date',key: 'opening_date' },
-        { tvticketip: 'tvticketip', title: 'tvticketip',key: 'tvticketip' },
       ],
-      branchData: [],
-      newbranch: {
-        branchname: '',
+      configData: [],
+      newConfig: {
+        paramname: '',
         value: '',
       },
       successMessageVisible: false,
-      messageText: '',
-      hoveredRow: null,
+      messageText: ''
     }
   },
   computed: {
     formFields() {
       return [
         {
-          name: 'branch_code',
+          name: 'paramname',
           component: 'v-text-field',
-          label: 'Branch Code',
+          label: 'Parameter Name',
+          required: true,
+          variant: "outlined",
+          rules: [
+            v => !!v || 'Parameter Name is required',
+           ]
+        },
+       {
+          name: 'value',
+          component: 'v-text-field',
+          label: 'Value',
           required: true,
           variant: "outlined",
           rules: [
             v => !!v || 'Value is required',
            ]
         },
-        {
-          name: 'branch_name',
-          component: 'v-text-field',
-          label: 'Branch Name',
-          required: true,
-          variant: "outlined",
-          rules: [
-            v => !!v || 'Branch Name is required',
-           ]
-        },
-        
-        {
-          name: 'range_ip',
-          component: 'v-text-field',
-          label: 'Range ip',
-          required: true,
-          variant: "outlined",
-          rules: [
-            v => !!v || 'Parameter Name is required',
-           ]
-        },
-        {
-          name: 'company_id',
-          component: 'v-text-field',
-          label: 'Company Name',
-          required: true,
-          variant: "outlined",
-          rules: [
-            v => !!v || 'Company Name is required',
-           ]
-        },
-        {
-          name: 'opening_date',
-          component: 'v-text-field',
-          label: 'Opening Date',
-          required: true,
-          variant: "outlined",
-          rules: [
-            v => !!v || 'Parameter Name is required',
-           ]
-        },
-       
       ]
     },
     dialogTitle(){
-      return this.editedIndex === -1 ? 'Add branch' : 'Edit branch'
+      return this.editedIndex === -1 ? 'Add Configuration' : 'Edit Configuration'
     },
+    // loading: function() {
+    //   return false; // Assuming loading state is not used in the code provided
+    // },
   },
   methods:{
-    handlerHover(value){
-      console.log(value)
-    },
     openDialog() {
       this.dialogVisible = true
     },
@@ -212,51 +155,58 @@ export default {
       this.dialogAction = 'Add'
       this.formFields = {}
     },
-    async getbranch(){
+    async getConfiguration(){
       const authStore = useAuthStore();
-      const baseUrl = `${import.meta.env.VITE_API_URL}/branch`
+      const baseUrl = `${import.meta.env.VITE_API_URL}/configuration`
       const token = await authStore.getToken
       try {
         const respone = await axios.get(baseUrl,{
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
         })
         if(respone.data.status === true){
-          this.branchData = respone.data.data
+          this.configData = respone.data.data
         }
       } catch (error) {
-        console.error('Error fetching branch data:', error)
+        console.error('Error fetching Configuration data:', error)
       }
     },
-    async addbranch() {
-      const baseUrl = `${import.meta.env.VITE_API_URL}/branch`
+    async addConfig() {
+      const baseUrl = `${import.meta.env.VITE_API_URL}/configuration`
       const authStore = useAuthStore()
       const token = authStore.getToken
       try {
-        const response = await axios.post(baseUrl, this.newbranch, {
+        const response = await axios.post(baseUrl, this.newConfig, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         })
-        if(response.data.status === true){
-          this.branchData.push( response.data.data )
+        if(response.status == 201){
+          this.configData.push( response.data.data )
           this.successMessageVisible = true
           this.messageText = 'Add'
         }
       } catch (error) {
-        console.error('Error adding branch :', error);
+        console.error('Error adding Configuration :', error);
       }
     },
     
     deleteItem(item) {
-      if(item){ this.selected = [item]}
+      this.editedIndex = this.configData.indexOf(item)  //Get Index from ID json data from table
       this.dialogDelete = true
     },
-    async deleteItemConfirm(){
+    async deleteItemConfirm() {
       let deleteIds = []
-      if (this.selected.length > 0) {
-        for (const selectedItem of this.selected) {
-          deleteIds.push(selectedItem.id)
+      if(this.editedIndex !== -1){
+        const deletedRow = this.configData[this.editedIndex]
+        deleteIds.push(deletedRow.id)
+        this.selected = []
+      }else {
+        if (this.selected.length > 0) {
+          for (const selectedItem of this.selected) {
+            deleteIds.push(selectedItem.id)
+            
+          }
         }
       }
       // delete in database
@@ -271,16 +221,16 @@ export default {
         if(response.data.status == true){
           // delete 1 row
           if(this.editedIndex !== -1){
-            this.branchData.splice(this.editedIndex, 1)
+            this.configData.splice(this.editedIndex, 1)
             this.successMessageVisible = true
             this.messageText = 'Delete'
           }
           // delete more then row
           if (this.selected.length > 0) {
             for (const selectedItem of this.selected) {
-              const index = this.branchData.indexOf(selectedItem);
+              const index = this.configData.indexOf(selectedItem);
               if (index !== -1) {
-                this.branchData.splice(index, 1);
+                this.configData.splice(index, 1);
                 this.successMessageVisible = true
                 this.messageText = 'Delete'
               }
@@ -289,31 +239,31 @@ export default {
           }
         }
       } catch (error) {
-        console.error('Error delete branch:', error);
+        console.error('Error delete config:', error);
       }
       this.dialogDelete = false
     },
     editItem(item) {
       if( item ){
         this.selected = [item]
-        this.newbranch = {...item}
+        this.newConfig = {...item}
         this.dialogAction = 'Edit';
         this.dialogVisible = true;
       }else if (this.selected.length === 1){
-        this.editedIndex = this.branchData.indexOf(this.selected[0])
-        this.newbranch = { ...this.selected[0] };
+        this.editedIndex = this.configData.indexOf(this.selected[0])
+        this.newConfig = { ...this.selected[0] };
         this.dialogAction = 'Edit';
         this.dialogVisible = true;
       }
     },
-    async updatebranch() {
-      const baseUrl = `${import.meta.env.VITE_API_URL}/branch`;
+    async updateConfig() {
+      const baseUrl = `${import.meta.env.VITE_API_URL}/configuration`;
       const authStore = useAuthStore();
       const token = authStore.getToken;
       try {
         const response = await axios.put(
-          `${baseUrl}/${this.newbranch.id}`,
-          this.newbranch,
+          `${baseUrl}/${this.newConfig.id}`,
+          this.newConfig,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -321,17 +271,17 @@ export default {
             },
           }
         );
-        if (response.data.status === true) {
-          //Find the updated branch in the branchData array
+        if (response.data.status === 'success') {
+          //Find the updated configuration in the configData array
           
-          const updatedbranch = response.data.data;
-          if (updatedbranch) {
-            const branchIndex = this.branchData.findIndex(
-              (branch) => branch.id === updatedbranch.id
+          const updatedConfig = response.data.data;
+          if (updatedConfig) {
+            const configIndex = this.configData.findIndex(
+              (config) => config.id === updatedConfig.id
             );
-            if (branchIndex !== -1) {
-              // Replace the branch at the corresponding index with the response data
-              this.branchData.splice(branchIndex, 1, updatedbranch);
+            if (configIndex !== -1) {
+              // Replace the configuration at the corresponding index with the response data
+              this.configData.splice(configIndex, 1, updatedConfig);
             }
           }
           this.selected = []
@@ -340,19 +290,19 @@ export default {
           this.messageText = 'Update'
         }
       } catch (error) {
-        console.error('Error updating branch:', error);
+        console.error('Error updating Configuration:', error);
       }
     },
     submitForm() {
       if (this.dialogAction === 'Add') {
-        this.addbranch()
+        this.addConfig()
       } else {
-        this.updatebranch()
+        this.updateConfig()
       }
     },
   },
   mounted(){
-    this.getbranch()
+    this.getConfiguration()
   }
 }
 </script>
@@ -370,12 +320,9 @@ export default {
     max-width: 400px;
     border-radius: 50px !important;
   }
-  .custom-datatable tbody tr:hover {
-    background-color: #f5f5f5ce; /* Set the desired background color */
-    /* cursor: pointer; */
-  }
-  .selected-row {
-    background-color: #e3f2fd !important; /* Set the desired selected background color */
-  }
-
+  .snackbar-bottom-right {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+}
 </style>

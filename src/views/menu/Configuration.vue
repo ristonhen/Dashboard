@@ -4,14 +4,17 @@
       <v-btn color="blue-grey-darken-3" @click="openDialog" icon>
         <v-icon>mdi-plus</v-icon>
       </v-btn>
-      <v-sheet class="ps-1" v-if="selected.length > 1">
-        <v-btn color="red-darken-4" icon @click="deleteItem">
+      <v-sheet class="ps-1" v-if="selected.length > 0">
+        <v-btn color="red-darken-4" icon @click="deleteItem()">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
-      </v-sheet>
+        
+      </v-sheet >
+      <v-btn color="blue-grey-darken-3" @click="editItem()" icon v-if="selected.length ===1">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
       <v-spacer></v-spacer>
       <v-text-field
-          :loading="loading"
           variant="solo"
           v-model="search"
           append-inner-icon="mdi-magnify"
@@ -26,19 +29,43 @@
     <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="desserts"
+      :items="configData"
       :search="search"
       show-select
       return-object
       items-per-page="15"
       class="elevation-1 custom-datatable"
+      hover
+      @mouseover:row="handleMouseOver"
     >
-      <template v-slot:[`item.actions`]="{ item }">
-        <v-icon size="small" class="me-2" @click="editItem()">
+      <template v-slot:[`item.paramname`]="{ item }">
+        <span>{{ item.paramname }}</span>
+        <v-spacer></v-spacer>
+        <v-icon size="small" class="me-2" @click="editItem(item)">
           mdi-pencil
         </v-icon>
         <v-icon size="small" color="error" @click="deleteItem(item)"> mdi-delete </v-icon>
       </template>
+
+      <!-- <template v-slot:item="{ item }">
+        <tr :class="{ 'row-hovered': hoveredRow === item }" @mouseover="hoveredRow = item" @mouseleave="hoveredRow = null">
+          <template v-for="header in headers" :key="header.key">
+            <td>
+              {{ item[header.key] }}
+            </td>
+          </template>
+          <td>
+            <template v-if="hoveredRow === item">
+              <v-btn icon small class="mr-2" @click="editItem(item)">
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn icon small color="error" @click="deleteItem(item)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </template>
+          </td>
+        </tr>
+      </template> -->
     </v-data-table>
     <ModalDialog
       v-model="dialogVisible"
@@ -48,7 +75,7 @@
       :form-data="newConfig"
       :form-fields="formFields"
       @closeDialog="closeDialog"
-      @submit-form="addConfig"
+      @submit-form="submitForm"
     ></ModalDialog>
      <v-dialog 
         v-model="dialogDelete" 
@@ -62,15 +89,16 @@
         <v-card-text>Are you sure you want to delete this item?</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green-darken-1" variant="text" @click="dialogDelete = false" > Cancel </v-btn>
+          <v-btn color="green-darken-1" variant="text" @click="dialogDelete = false" > Close </v-btn>
           <v-btn color="green-darken-1" variant="text" @click="deleteItemConfirm" >Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </v-card>
-  <v-spacer></v-spacer>
-  <v-snackbar v-model="successMessageVisible" :timeout="100000" color="success" class="snackbar-bottom-right">Form submitted successfully.</v-snackbar>
-  
+  <!-- <v-spacer></v-spacer> -->
+  <v-snackbar v-model="successMessageVisible" :timeout="1000" color="success" class="snackbar-bottom-right">
+    Form {{messageText}} successfully.
+  </v-snackbar>
 </template>
 <script>
 import axios from 'axios'
@@ -87,9 +115,7 @@ export default {
       dialogDelete: false,
       editedIndex: -1,
       dialogVisible: false,
-      // dialogTitle: 'ADD USER',
       dialogAction: 'Add',
-      messsage: null,
       search: '',
       headers: [
         { align: 'start', key: 'id', sortable: false, title: 'NO'},
@@ -99,15 +125,15 @@ export default {
         { created_date: 'created_date', title: 'created_date',key: 'created_date' },
         { modified_by: 'iron', title: 'modified_by',key: 'modified_by' },
         { modified_date: 'iron', title: 'modified_date',key: 'modified_date' },
-        { title: 'Actions', key: 'actions', sortable: false },
-
       ],
-      desserts: [],
+      configData: [],
       newConfig: {
         paramname: '',
         value: '',
       },
-      successMessageVisible: true,
+      successMessageVisible: false,
+      messageText: '',
+      hoveredRow: null,
     }
   },
   computed: {
@@ -138,11 +164,19 @@ export default {
     dialogTitle(){
       return this.editedIndex === -1 ? 'Add Configuration' : 'Edit Configuration'
     },
-    loading: function() {
-      return false; // Assuming loading state is not used in the code provided
-    },
   },
   methods:{
+    handlerHover(value){
+      console.log(value)
+    },
+    openDialog() {
+      this.dialogVisible = true
+    },
+    closeDialog() {
+      this.dialogVisible = false
+      this.dialogAction = 'Add'
+      this.formFields = {}
+    },
     async getConfiguration(){
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/configuration`
@@ -152,7 +186,7 @@ export default {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
         })
         if(respone.data.status === true){
-          this.desserts = respone.data.data
+          this.configData = respone.data.data
         }
       } catch (error) {
         console.error('Error fetching Configuration data:', error)
@@ -170,34 +204,25 @@ export default {
           },
         })
         if(response.status == 201){
-          this.desserts.push( response.data.data )
+          this.configData.push( response.data.data )
+          this.successMessageVisible = true
+          this.messageText = 'Add'
         }
       } catch (error) {
         console.error('Error adding Configuration :', error);
       }
     },
-    openDialog() {
-      this.dialogVisible = true;
-    },
-    closeDialog() {
-      this.dialogVisible = false;
-      this.formFields = {}
-    },
+    
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item)  //Get Index from ID json data from table
+      if(item){ this.selected = [item]}
       this.dialogDelete = true
     },
-    async deleteItemConfirm() {
+    async deleteItemConfirm(){
       let deleteIds = []
-      if(this.editedIndex !== -1){
-        const deletedRow = this.desserts[this.editedIndex]
-        deleteIds.push(deletedRow.id)
-        this.selected = []
-      }else {
-        if (this.selected.length > 0) {
-          for (const selectedItem of this.selected) {
-            deleteIds.push(selectedItem.id)
-          }
+      if (this.selected.length > 0) {
+        for (const selectedItem of this.selected) {
+          deleteIds.push(selectedItem.id)
+          console.log(selectedItem)
         }
       }
       // delete in database
@@ -210,17 +235,20 @@ export default {
           data: { ids: deleteIds },
         })
         if(response.data.status == true){
-          console.log(response.data.messsage)
           // delete 1 row
           if(this.editedIndex !== -1){
-            this.desserts.splice(this.editedIndex, 1)
+            this.configData.splice(this.editedIndex, 1)
+            this.successMessageVisible = true
+            this.messageText = 'Delete'
           }
           // delete more then row
           if (this.selected.length > 0) {
             for (const selectedItem of this.selected) {
-              const index = this.desserts.indexOf(selectedItem);
+              const index = this.configData.indexOf(selectedItem);
               if (index !== -1) {
-                this.desserts.splice(index, 1);
+                this.configData.splice(index, 1);
+                this.successMessageVisible = true
+                this.messageText = 'Delete'
               }
             }
             this.selected = [];
@@ -231,12 +259,68 @@ export default {
       }
       this.dialogDelete = false
     },
+    editItem(item) {
+      if( item ){
+        this.selected = [item]
+        this.newConfig = {...item}
+        this.dialogAction = 'Edit';
+        this.dialogVisible = true;
+      }else if (this.selected.length === 1){
+        this.editedIndex = this.configData.indexOf(this.selected[0])
+        this.newConfig = { ...this.selected[0] };
+        this.dialogAction = 'Edit';
+        this.dialogVisible = true;
+      }
+    },
+    async updateConfig() {
+      const baseUrl = `${import.meta.env.VITE_API_URL}/configuration`;
+      const authStore = useAuthStore();
+      const token = authStore.getToken;
+      try {
+        const response = await axios.put(
+          `${baseUrl}/${this.newConfig.id}`,
+          this.newConfig,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.data.status === 'success') {
+          //Find the updated configuration in the configData array
+          
+          const updatedConfig = response.data.data;
+          if (updatedConfig) {
+            const configIndex = this.configData.findIndex(
+              (config) => config.id === updatedConfig.id
+            );
+            if (configIndex !== -1) {
+              // Replace the configuration at the corresponding index with the response data
+              this.configData.splice(configIndex, 1, updatedConfig);
+            }
+          }
+          this.selected = []
+          this.closeDialog();
+          this.successMessageVisible = true
+          this.messageText = 'Update'
+        }
+      } catch (error) {
+        console.error('Error updating Configuration:', error);
+      }
+    },
+    submitForm() {
+      if (this.dialogAction === 'Add') {
+        this.addConfig()
+      } else {
+        this.updateConfig()
+      }
+    },
   },
   mounted(){
     this.getConfiguration()
   }
 }
-
 </script>
 
 <style>
@@ -252,9 +336,12 @@ export default {
     max-width: 400px;
     border-radius: 50px !important;
   }
-  .snackbar-bottom-right {
-  position: absolute;
-  bottom: 16px;
-  right: 16px;
-}
+  .custom-datatable tbody tr:hover {
+    background-color: #f5f5f5ce; /* Set the desired background color */
+    /* cursor: pointer; */
+  }
+  .selected-row {
+    background-color: #e3f2fd !important; /* Set the desired selected background color */
+  }
+
 </style>

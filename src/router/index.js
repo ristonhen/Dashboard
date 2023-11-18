@@ -53,7 +53,7 @@ const routes = [
           {
             path: '/test',
             name: 'test',
-            component: Utest,
+            component: Test,
             meta: {
               requiresAuth: true
             }

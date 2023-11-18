@@ -6,7 +6,7 @@
     <v-app-bar-nav-icon @click="toggleDrawer"/>
     <v-spacer></v-spacer>
     <v-row align="center">
-      <v-col cols="auto">
+      <!-- <v-col cols="auto">
         <v-text-field
           :loading="loading"
           variant="solo"
@@ -23,7 +23,7 @@
           @click:append-inner="onClick"
           class="custom-text-field"
         ></v-text-field>
-      </v-col>
+      </v-col> -->
       <v-spacer></v-spacer>
       <v-col cols="auto" justify="end">
           <v-menu

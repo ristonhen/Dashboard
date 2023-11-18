@@ -4,9 +4,17 @@
       <v-btn color="blue-grey-darken-3" @click="openDialog" icon>
         <v-icon>mdi-plus</v-icon>
       </v-btn>
+      <v-sheet class="ps-1" v-if="selected.length > 0">
+        <v-btn color="red-darken-4" icon @click="deleteItem()">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+        
+      </v-sheet >
+      <v-btn color="blue-grey-darken-3" @click="editItem()" icon v-if="selected.length ===1">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
       <v-spacer></v-spacer>
       <v-text-field
-          :loading="loading"
           variant="solo"
           v-model="search"
           append-inner-icon="mdi-magnify"
@@ -14,71 +22,118 @@
           single-line
           hide-details
           @click:append-inner="onClick"
+          density="comfortable"
           class="custom-text-field pr-4"
         ></v-text-field>
-      
     </v-card-title>
     <v-data-table
+      v-model="selected"
       :headers="headers"
-      :items="users"
+      :items="usersData"
       :search="search"
+      show-select
+      return-object
+      items-per-page="15"
       class="elevation-1 custom-datatable"
+      hover
     >
+      <template v-slot:[`item.username`]="{ item }">
+        <span>{{ item.username }}</span>
+        <v-spacer></v-spacer>
+        <v-icon size="small" class="me-2" @click="editItem(item)">
+          mdi-pencil
+        </v-icon>
+        <v-icon size="small" color="error" @click="deleteItem(item)"> mdi-delete </v-icon>
+      </template>
+
+      <!-- <template v-slot:item="{ item }">
+        <tr :class="{ 'row-hovered': hoveredRow === item }" @mouseover="hoveredRow = item" @mouseleave="hoveredRow = null">
+          <template v-for="header in headers" :key="header.key">
+            <td>
+              {{ item[header.key] }}
+            </td>
+          </template>
+          <td>
+            <template v-if="hoveredRow === item">
+              <v-btn icon small class="mr-2" @click="editItem(item)">
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn icon small color="error" @click="deleteItem(item)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </template>
+          </td>
+        </tr>
+      </template> -->
     </v-data-table>
     <ModalDialog
       v-model="dialogVisible"
       :toggleVisible="dialogVisible"
       :dialog-title="dialogTitle"
       :dialog-action="dialogAction"
-      :form-data="newUser"
+      :form-data="newUsers"
       :form-fields="formFields"
       @closeDialog="closeDialog"
-      @submit-form="addUser"
+      @submit-form="submitForm"
     ></ModalDialog>
+     <v-dialog 
+        v-model="dialogDelete" 
+        width="500"
+        persistent
+     >
+      <v-card>
+        <v-card-title class="text-h5">
+          Delete users
+        </v-card-title>
+        <v-card-text>Are you sure you want to delete this item?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green-darken-1" variant="text" @click="dialogDelete = false" > Close </v-btn>
+          <v-btn color="green-darken-1" variant="text" @click="deleteItemConfirm" >Ok</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
-  <!-- Display the entered user data -->
-<v-card v-if="enteredUserData">
-  <v-card-title class="headline">Entered User Data</v-card-title>
-  <v-card-text>
-    <pre>{{ JSON.stringify(enteredUserData, null, 2) }}</pre>
-  </v-card-text>
-</v-card>
+  <!-- <v-spacer></v-spacer> -->
+  <v-snackbar v-model="successMessageVisible" :timeout="1000" color="success" class="snackbar-bottom-right">
+    Form {{messageText}} successfully.
+  </v-snackbar>
 </template>
-
 <script>
 import axios from 'axios'
 import { useAuthStore } from '@/store/authStore'
 import ModalDialog from '@/components/ModalDialog.vue'
+const baseUrl = `${import.meta.env.VITE_API_URL}/users`
+const authStore = useAuthStore()
 export default {
-  name: 'Usermanagement',
+  name: 'users',
   components:{ ModalDialog },
   data(){
     return {
+      selected: [],
+      dialogDelete: false,
+      editedIndex: -1,
+      dialogVisible: false,
+      dialogAction: 'Add',
+      search: '',
+      headers: [
+        { username: 'calories', title: 'username',key: 'username' },
+        { fullname: 'calories', title: 'fullname',key: 'fullname' },
+        { email: 'fat', title: 'Email' ,key: 'email'},
+        { branch_name: 'carbs', title: 'Branch Name',key: 'branch_name' },
+        { rolename: 'protein', title: 'Role Name',key: 'rolename' },
+        { created_by: 'iron', title: 'created_by',key: 'created_by' },
+        { created_date: 'iron', title: 'created_date',key: 'created_date' },
+        { modified_by: 'iron', title: 'modified_by',key: 'modified_by' },
+        { modified_date: 'iron', title: 'modified_date',key: 'modified_date' },
+        { last_pwd_modified_date: 'iron', title: 'last_pwd_modified_date',key: 'last_pwd_modified_date' },
+        { deviceid: 'iron', title: 'deviceid',key: 'deviceid' },
+        { phone_number: 'iron', title: 'phone_number',key: 'phone_number' },
+      ],
       branchData: [],
       roleData: [],
-      enteredUserData: null,
-      dialogVisible: false,
-      dialogTitle: 'ADD USER',
-      dialogAction: 'Add',
-      messsage: null,
-       search: '',
-        headers: [
-          { align: 'start', key: 'user_id', sortable: false, title: 'ID'},
-          { fullname: 'calories', title: 'fullname',key: 'fullname' },
-          { username: 'calories', title: 'username',key: 'username' },
-          { email: 'fat', title: 'Email' ,key: 'email'},
-          { branch_name: 'carbs', title: 'Branch Name',key: 'branch_name' },
-          { rolename: 'protein', title: 'Role Name',key: 'rolename' },
-          { created_by: 'iron', title: 'created_by',key: 'created_by' },
-          { created_date: 'iron', title: 'created_date',key: 'created_date' },
-          { modified_by: 'iron', title: 'modified_by',key: 'modified_by' },
-          { modified_date: 'iron', title: 'modified_date',key: 'modified_date' },
-          { last_pwd_modified_date: 'iron', title: 'last_pwd_modified_date',key: 'last_pwd_modified_date' },
-          { deviceid: 'iron', title: 'deviceid',key: 'deviceid' },
-          { phone_number: 'iron', title: 'phone_number',key: 'phone_number' },
-        ],
-      users: [],
-      newUser: {
+      usersData: [],
+      newUsers: {
         fullname: '',
         username: '',
         email: '',
@@ -88,9 +143,11 @@ export default {
         phone_number: '',
         description: '',
         branch_id: '',
-        roleid: '1',
-        
-      }
+        roleid: '',
+      },
+      successMessageVisible: false,
+      messageText: '',
+      hoveredRow: null,
     }
   },
   computed: {
@@ -104,8 +161,6 @@ export default {
           variant: "outlined",
           rules: [
             v => !!v || 'Full Name is required',
-            v => !/[!@#$%^&*(),.?":{}|<>]/.test(v) || 'User Name cannot contain special characters',
-            v => !/(drop|delete|alter|select|insert|update)/i.test(v) || 'User Name cannot contain forbidden keywords',
           ]
         },
         {
@@ -116,8 +171,6 @@ export default {
           variant: "outlined",
           rules: [
             v => !!v || 'User Name is required',
-            v => !/[!@#$%^&*(),.?":{}|<>]/.test(v) || 'User Name cannot contain special characters',
-            v => !/(drop|delete|alter|select|insert|update)/i.test(v) || 'User Name cannot contain forbidden keywords',
           ]
         },
         {
@@ -128,9 +181,6 @@ export default {
           variant: "outlined",
           rules: [
             v => !!v || 'User Name is required',
-            v => /^\s*$/.test(v) || /^[\w.]+$/.test(v) || 'User Name can only contain letters (a-z, A-Z), numbers, and a single period (.)',
-            v => (v && v.indexOf('.') === v.lastIndexOf('.')) || 'User Name can only contain a single period (.)',
-            v => !/(drop|delete|alter|select|insert|update)/i.test(v) || 'User Name cannot contain forbidden keywords',
           ]
         },
         {
@@ -156,7 +206,7 @@ export default {
           name: 'phone_number',
           component: 'v-text-field',
           label: 'Phone',
-          required: true,
+          required: false,
           variant: 'outlined',
           rules: [
             (v) => /^\d{1,11}$/.test(v) || 'Phone number must be 10 or 11 digits',
@@ -193,8 +243,22 @@ export default {
         },
       ];
     },
+    dialogTitle(){
+      return this.editedIndex === -1 ? 'Add users' : 'Edit users'
+    },
   },
   methods:{
+    handlerHover(value){
+      console.log(value)
+    },
+    openDialog() {
+      this.dialogVisible = true
+    },
+    closeDialog() {
+      this.dialogVisible = false
+      this.dialogAction = 'Add'
+      this.formFields = {}
+    },
     async getRole(){
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/role`
@@ -226,8 +290,8 @@ export default {
         const respone = await axios.get(baseUrl,{
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
         })
-        if(respone.status == 200){
-          this.branchData = respone.data
+        if(respone.data.status == true){
+          this.branchData = respone.data.data
           // console.log(this.branchData.map(branch => ({
           //   branch_id: branch.branch_id,
           //   branch_name: branch.branch_name
@@ -239,7 +303,7 @@ export default {
       }
 
     },
-    async getUser(){
+    async getUsers(){
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/users`
       const token = await authStore.getToken
@@ -248,50 +312,146 @@ export default {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
         })
         if(respone.data.status === true){
-          this.users = respone.data.users
+          this.usersData = respone.data.users
         }
       } catch (error) {
-        console.error('Error fetching user data:', error)
+        console.error('Error fetching users data:', error)
       }
     },
-    openDialog() {
-      this.dialogVisible = true;
-    },
-    closeDialog() {
-      this.dialogVisible = false;
-      this.formFields = {}
-    },
-    async addUser() {
+    async addusers() {
       const baseUrl = `${import.meta.env.VITE_API_URL}/users`
       const authStore = useAuthStore()
       const token = authStore.getToken
-      console.log({...this.newUser})
       try {
-        this.newUser.email = this.newUser.email + "@gmail.com"
-        const response = await axios.post(baseUrl, this.newUser, {
+        if (!this.newUsers.email.includes("@")) {
+          this.newUsers.email += "@gmail.com";
+        }
+        // this.newUsers.email = this.newUsers.email + "@gmail.com"
+        const response = await axios.post(baseUrl, this.newUsers, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         })
-        if(response.status == 201){
-          // this.users.push({ ...this.newUser })
-          // this.users.push({ ...this.newUser })
-          this.users.push( response.data )
-
+        if(response.data.status === true){
+          this.usersData.push( response.data.data )
+          this.successMessageVisible = true
+          this.messageText = 'Add'
         }
-        this.enteredUserData = { ...this.newUser }
       } catch (error) {
-        console.error('Error adding user:', error);
+        console.error('Error adding users :', error);
+      }
+    },
+    
+    deleteItem(item) {
+      if(item){ this.selected = [item]}
+      this.dialogDelete = true
+    },
+    async deleteItemConfirm(){
+      let deleteIds = []
+      if (this.selected.length > 0) {
+        for (const selectedItem of this.selected) {
+          deleteIds.push(selectedItem.id)
+        }
+      }
+      // delete in database
+      try {
+        const response = await axios.delete(baseUrl, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authStore.getToken}`,
+          },
+          data: { ids: deleteIds },
+        })
+        if(response.data.status == true){
+          // delete 1 row
+          if(this.editedIndex !== -1){
+            this.usersData.splice(this.editedIndex, 1)
+            this.successMessageVisible = true
+            this.messageText = 'Delete'
+          }
+          // delete more then row
+          if (this.selected.length > 0) {
+            for (const selectedItem of this.selected) {
+              const index = this.usersData.indexOf(selectedItem);
+              if (index !== -1) {
+                this.usersData.splice(index, 1);
+                this.successMessageVisible = true
+                this.messageText = 'Delete'
+              }
+            }
+            this.selected = [];
+          }
+        }
+      } catch (error) {
+        console.error('Error delete users:', error);
+      }
+      this.dialogDelete = false
+    },
+    editItem(item) {
+      if( item ){
+        this.selected = [item]
+        this.newUsers = {...item}
+        this.dialogAction = 'Edit';
+        this.dialogVisible = true;
+      }else if (this.selected.length === 1){
+        this.editedIndex = this.usersData.indexOf(this.selected[0])
+        this.newUsers = { ...this.selected[0] };
+        this.dialogAction = 'Edit';
+        this.dialogVisible = true;
+      }
+    },
+    async updateusers() {
+      const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
+      const authStore = useAuthStore();
+      const token = authStore.getToken;
+      try {
+        const response = await axios.put(
+          `${baseUrl}/${this.newUsers.id}`,
+          this.newUsers,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response.data)
+        if (response.data.status === true) {
+          //Find the updated users in the usersData array
+          
+          const updatedusers = response.data.data;
+          if (updatedusers) {
+            const usersIndex = this.usersData.findIndex(
+              (users) => users.id === updatedusers.id
+            );
+            if (usersIndex !== -1) {
+              // Replace the users at the corresponding index with the response data
+              this.usersData.splice(usersIndex, 1, updatedusers);
+            }
+          }
+          this.selected = []
+          this.closeDialog();
+          this.successMessageVisible = true
+          this.messageText = 'Update'
+        }
+      } catch (error) {
+        console.error('Error updating users:', error);
+      }
+    },
+    submitForm() {
+      if (this.dialogAction === 'Add') {
+        this.addusers()
+      } else {
+        this.updateusers()
       }
     },
   },
   mounted(){
-    this.getUser()
+    this.getUsers()
     this.getBranch()
     this.getRole()
   }
-  
 }
 </script>
 
@@ -308,4 +468,12 @@ export default {
     max-width: 400px;
     border-radius: 50px !important;
   }
+  .custom-datatable tbody tr:hover {
+    background-color: #f5f5f5ce; /* Set the desired background color */
+    /* cursor: pointer; */
+  }
+  .selected-row {
+    background-color: #e3f2fd !important; /* Set the desired selected background color */
+  }
+
 </style>

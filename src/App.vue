@@ -19,4 +19,10 @@
 	box-sizing: border-box;
 	// font-family: '', sans-serif;
 }
+
+.v-text-field .v-field {
+    cursor: text;
+    border-radius: 8px;
+}
+
 </style>

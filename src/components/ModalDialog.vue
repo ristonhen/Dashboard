@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogVisible" max-width="600px" >
+  <v-dialog v-model="dialogVisible" persistent max-width="600px" >
     <v-card>
       <v-card-title class="bg-blue-grey-darken-2">{{ dialogTitle }}</v-card-title>
       <v-card-text>
@@ -101,7 +101,6 @@
         >{{ dialogAction }}</v-btn>
       </v-card-actions>
     </v-card>
-    <v-snackbar v-model="successMessageVisible" :timeout="1000" color="success">Form submitted successfully.</v-snackbar>
   </v-dialog>
   
 </template>
@@ -138,19 +137,6 @@ export default {
     return {
       dialogVisible: false,
       validationErrors: {},
-      successMessageVisible: false,
-      selectedBranch: null,
-      branchData: [
-        {
-          value: 1,
-          text: "TNM KP"
-        },
-        {
-          value: 2,
-          text: "TNM KPS"
-        },
-        // Add the remaining objects as per your data
-      ]
     }
   },
   watch: {
