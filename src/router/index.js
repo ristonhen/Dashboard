@@ -84,6 +84,28 @@ const routes = [
           requiresNoAuth: true
         }
       },
+      {
+        path: '/resetpassword/:param',
+        name: 'Resetpwd',
+        component: () => import('@/views/menu/Resetpwd.vue'),
+        meta: {
+          requiresNoAuth: true,
+          title: "Forgotten Password | Can't login"
+        },
+        beforeEnter: (to, from, next) => {
+          document.title = to.meta.title || 'Default Title';
+          next();
+        }
+      },
+      {
+        path: '/forgot-password',
+        name: 'forgot-password',
+        component: () => import('@/components/ForgetPassword.vue'),
+        meta: {
+          requiresNoAuth: true,
+          title: "Forgotten Password | Can't login"
+        },
+      },
     ]
   }
 ]

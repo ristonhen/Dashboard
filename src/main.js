@@ -7,11 +7,12 @@ import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 import VueApexCharts from "vue3-apexcharts"
 
+
 const pinia = createPinia()
 loadFonts()
 
-createApp(App)
-  .use(pinia)
+const app = createApp(App)
+app.use(pinia)
   .use(router)
   .use(vuetify)
   .use(VueApexCharts)

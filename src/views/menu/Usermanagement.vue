@@ -263,6 +263,7 @@ export default {
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/role`
       const token = await authStore.getToken
+      
       try {
         const respone = await axios.get(baseUrl,{
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
@@ -304,6 +305,7 @@ export default {
 
     },
     async getUsers(){
+      
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/users`
       const token = await authStore.getToken

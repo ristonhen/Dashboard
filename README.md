@@ -50,5 +50,20 @@ dependency to your project.
 ```sh
 npm install @fortawesome/fontawesome-free -D
 ```
+dependency to your project.
+```sh
+# for to get data realtime from API
+npm i vue-socket.io 
+npm i vue-socket.io-extended
+npm i socket.io-client
+```
 
+# start project
+
+```sh
+# for to get data realtime from API
+npm install
+npm run dev
+
+```
 

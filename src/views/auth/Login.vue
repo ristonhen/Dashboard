@@ -34,6 +34,11 @@
                  :append-inner-icon="passwordShow ? 'mdi-eye':'mdi-eye-off'"
                  @click:append-inner="passwordShow = !passwordShow"
               />
+              <div class="text-right">
+                <router-link to="/forgot-password" class="text-decoration-none">
+                  Forgot Password?
+                </router-link>
+              </div>
               <!-- :append-icon="passwordShow ? 'mdi-eye':'mdi-eye-off'"
                  @click:append="passwordShow = !passwordShow"
                  required -->
@@ -58,20 +63,22 @@
       Login success
     </v-snackbar>
   </v-app>
-  <p>{{ message }}</p>
+  <!-- <ResetPassword v-else/> -->
 </template>
 
 <script>
 import { useAuthStore } from '@/store/authStore'
+import ResetPassword from '@/views/menu/Resetpwd.vue'
 export default {
   name: 'Login',
+  components: { ResetPassword },
   data: () => ({
     error: null,
     success: false,
     loading:false,
     snackbar:false,
     passwordShow:false,
-    username: 'ristonhen@gmail.com',
+    username: 'risto.nhen@canadiabank.com.kh',
     emailRules: [
       v => !!v || 'E-mail is required',
       v => /.+@.+\..+/.test(v) || 'E-mail must be valid',

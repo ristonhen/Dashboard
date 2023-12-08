@@ -310,6 +310,7 @@ export default {
       const baseUrl = `${import.meta.env.VITE_API_URL}/branch`;
       const authStore = useAuthStore();
       const token = authStore.getToken;
+      
       try {
         const response = await axios.put(
           `${baseUrl}/${this.newbranch.id}`,
