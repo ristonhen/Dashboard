@@ -1,6 +1,6 @@
 <template>
   <v-list density="compact" nav>
-    <template v-for="(item, index) in menuItems" :key="index">
+    <template v-for="(item, index) in menuItems">
       <v-list-group
         v-if="item.submenus && item.submenus.length > 0"
         :key="'group-' + index"

@@ -1,9 +1,9 @@
 <template>
   <v-app>
-    <div class="backgruond"></div>
+    <!-- <div class="backgruond"></div> -->
     <v-main class="d-flex justify-center align-center">
       <v-col cols="10" lg="4" class="mx-auto">
-        <v-card class="pa-4">
+        <v-card class="pa-4" elevation="12">
           <div class="text-center">
             <v-avatar size="100" color="red-accent-4 ">
               <v-icon size="40" color="blue-lighten-5">mdi-account</v-icon>

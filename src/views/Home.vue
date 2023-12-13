@@ -1,16 +1,15 @@
 <template>
-  <v-app id="inspire" v-for="(app,index) in manageApp" :key="index">
+  <v-app id="inspire">
     <!-- permanent , expand-on-hover  , @click="rail = false""-->
     <v-navigation-drawer 
       v-model="drawer"
       :rail="rail"
-      
       expand-on-hover
     >
       <div class="sticky-top">
         <v-list-item
           lines="two"
-          :prepend-avatar="app.logo"
+          prepend-avatar="../assets/canalogo.webp"
           nav
           
         >
@@ -21,7 +20,7 @@
               @click.stop="rail = !rail"
             />
           </template>
-          <v-list-item-title class="font-weight-black text-body-2">{{ app.apptitle }}</v-list-item-title>
+          <v-list-item-title class="font-weight-black text-body-2">App Admin</v-list-item-title>
         </v-list-item>
         <v-divider />
       </div>
@@ -76,7 +75,6 @@
   .sticky-top
     position: sticky
     top: 0
-    background-color: white // Optional: Set a background color if desired
     z-index: 1
 
   .custom-scrollbar

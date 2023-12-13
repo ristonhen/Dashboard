@@ -1,7 +1,6 @@
 <template>
   <v-app-bar
-      class="indigo"
-      color="blue-grey-lighten-5"
+
   >
     <v-app-bar-nav-icon @click="toggleDrawer"/>
     <v-spacer></v-spacer>
@@ -109,7 +108,8 @@
             >
               <v-list-item>
                 <v-switch
-                  v-model="hints"
+                  :model-value="darkMode"
+                  @change="toggleTheme"
                   color="black"
                   label="Dark Mode"
                   hide-details
@@ -127,6 +127,7 @@
                     <v-icon :icon="item.icon" size="small"></v-icon>
                   </template>
                 </v-list-item>
+                
               </v-list-item>
             </v-list>
             <v-card-actions class="px-5">
@@ -147,7 +148,9 @@
   </v-app-bar>
 </template>
 <script>
+import { useTheme } from 'vuetify'
 import { useAuthStore } from '@/store/authStore'
+import { ref } from 'vue'
 export default {
   props: [ 'drawer' ],
   data(){
@@ -158,7 +161,6 @@ export default {
       fav: true,
       profile: false,
       message: false,
-      hints: true,
       profiles: [
         { text: 'Menu Sitting', icon: 'mdi-menu-open' },
         { text: 'Change password', icon: 'mdi-lock-reset' },
@@ -228,8 +230,17 @@ export default {
     const authStore = useAuthStore()
     const logout = authStore.logout
     const getUser = authStore.getUser
+    
+    const theme = useTheme()
+    const darkMode = ref(false);
+    function toggleTheme () {
+      theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+    }
     return {
-      logout,getUser
+      logout,
+      getUser, 
+      darkMode, 
+      toggleTheme
     }
   },
 }
