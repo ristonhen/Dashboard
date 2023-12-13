@@ -4,7 +4,6 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
 import NotFound from '@/layouts/NotFound.vue'
 import HomeVue from '@/views/Home.vue'
 import DashboardVue from "@/views/menu/Dashboard.vue"
-import Test from "@/views/menu/Test.vue"
 import Utest from "@/views/menu/ManageUser.vue"
 import Search from '@/components/Search.vue'
 
@@ -46,14 +45,6 @@ const routes = [
             path: '/Dashboard',
             name: 'Dashboard',
             component: DashboardVue,
-            meta: {
-              requiresAuth: true
-            }
-          },
-          {
-            path: '/test',
-            name: 'test',
-            component: Test,
             meta: {
               requiresAuth: true
             }
