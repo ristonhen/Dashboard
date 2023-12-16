@@ -1,19 +1,19 @@
 <template>
   <v-app>
-    <!-- <div class="backgruond"></div> -->
+    <div class="backgruond"></div>
     <v-main class="d-flex justify-center align-center">
       <v-col cols="10" lg="4" class="mx-auto">
-        <v-card class="pa-4" elevation="12">
+        <v-card class="pa-2" elevation="12" max-width="400">
           <div class="text-center">
             <v-avatar size="100" color="red-accent-4 ">
               <v-icon size="40" color="blue-lighten-5">mdi-account</v-icon>
             </v-avatar>
             <h2 class="indigo--text">login Page</h2>
           </div>
-          <v-form @submit.prevent="submitHandler" ref="form">
+          <v-form ref="form">
             <v-card-text>
               <v-text-field
-                class="my-3"
+                class="my-2"
                 v-model="username"
                 :rules="emailRules"
                 type="email"
@@ -21,6 +21,7 @@
                 placeholder="Email"
                 prepend-inner-icon="mdi-account"
                 variant="outlined"
+                density="comfortable"
                 required
               />
               <v-text-field
@@ -31,6 +32,7 @@
                  placeholder="Password"
                  prepend-inner-icon="mdi-key"
                  variant="outlined"
+                 density="comfortable"
                  :append-inner-icon="passwordShow ? 'mdi-eye':'mdi-eye-off'"
                  @click:append-inner="passwordShow = !passwordShow"
               />
@@ -49,8 +51,8 @@
                 size="large"
                 rounded="lg"
                 :loading="loading"
-                type="submit"
-                color="red-darken-4"
+                @click="submitHandler"
+                color="blue-darken-3"
               >
               <span class="white--text px-8 indigo">Login</span>
               </v-btn>
@@ -59,8 +61,8 @@
         </v-card>
       </v-col>
     </v-main>
-    <v-snackbar top color="green" v-model="snackbar">
-      Login success
+    <v-snackbar v-model="success" timeout="7000" color="success" class="snackbar-bottom-right">
+      {{ messageText }}
     </v-snackbar>
   </v-app>
   <!-- <ResetPassword v-else/> -->
@@ -73,6 +75,7 @@ export default {
   name: 'Login',
   components: { ResetPassword },
   data: () => ({
+    messageText: "",
     error: null,
     success: false,
     loading:false,
@@ -85,16 +88,24 @@ export default {
     ],
     password: 'Cana#123',
     passwordRules: [
-      v => !!v || 'Password is required',
-      v => (v && v.length >= 6) || 'Password must be 6  characters or more!',
-      // v => /[A-Z]/.test(v) || 'Password must contain at least one uppercase letter'
+      v => !!v || 'Password is required'
     ],
   }),
   methods:{
-    submitHandler(){
-      const useStore = useAuthStore();
-      useStore.submitHandler(this.username,this.password)
-    }
+    async submitHandler(){
+      const { valid } = await this.$refs.form.validate()
+      if (valid){
+        this.loading = true
+        const useStore = useAuthStore();
+        const response_login  = await useStore.submitHandler(this.username,this.password)
+        if(response_login.status != 200){
+          this.success = true
+          this.messageText = response_login.message
+          this.loading = false
+        }
+      }
+      
+    },
     
   },
 }

@@ -37,10 +37,14 @@ export default createVuetify({
       },
     },
     theme: {
+      options: {
+        customProperties: true,
+      },
       defaultTheme: 'myCustomLightTheme',
       themes: {
         myCustomLightTheme,
       },
-      defaultFontFamily: 'sans-serif'
+      defaultFontFamily: 'sans-serif',
+      fontSize: 10,
     }
   })

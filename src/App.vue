@@ -17,12 +17,13 @@
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+	font-size: 15px;
 	// font-family: '', sans-serif;
 }
 
 .v-text-field .v-field {
     cursor: text;
-    border-radius: 8px;
+    border-radius: 10px;
 }
 
 </style>

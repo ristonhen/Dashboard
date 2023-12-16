@@ -36,22 +36,23 @@ export const useAuthStore = defineStore(
           const response = await axios.post(baseUrl, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           })
-          if (response.status === 200 ) {
-            const { user, access_token } = response.data
+          
+          const { message, status } = response.data
+          if (status === 200 ) {
+            const { user, access_token } = response.data.data
             const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), depass).toString();
             const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(access_token), depass).toString()
             this.setTokenAndUser(encryptedUser,encryptedToken)
             window.location.reload()
             // this.$router.push('/Dashboard')
-            return true
+            return { message, status }
           } else {
             // Failed login
             this.isAuthenticated = false;
-            return false
+            return { message, status }
           }
         } catch (error) {
-          console.log(error.response);
-          return false
+          // console.log(error.response)          
         }
       }
     },

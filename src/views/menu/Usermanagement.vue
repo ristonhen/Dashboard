@@ -92,12 +92,13 @@
           <v-btn color="green-darken-1" variant="text" @click="deleteItemConfirm" >Ok</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog>  
+    <v-snackbar v-model="successMessageVisible" :timeout="1000" color="success" class="snackbar-bottom-right">
+      Form {{messageText}} successfully.
+    </v-snackbar>
   </v-card>
   <!-- <v-spacer></v-spacer> -->
-  <v-snackbar v-model="successMessageVisible" :timeout="1000" color="success" class="snackbar-bottom-right">
-    Form {{messageText}} successfully.
-  </v-snackbar>
+
 </template>
 <script>
 import axios from 'axios'
