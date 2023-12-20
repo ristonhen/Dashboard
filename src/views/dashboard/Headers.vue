@@ -150,6 +150,7 @@
 <script>
 import { useTheme } from 'vuetify'
 import { useAuthStore } from '@/store/authStore'
+import { useRoute, useRouter } from 'vue-router';
 import { ref } from 'vue'
 export default {
   props: [ 'drawer' ],
@@ -227,10 +228,19 @@ export default {
   mounted(){
   },
   setup() {
+    const route = useRoute();
+    const router = useRouter();
+
     const authStore = useAuthStore()
-    const logout = authStore.logout
     const getUser = authStore.getUser
-    
+
+    const logout = () => {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      localStorage.removeItem('route')
+      router.push('/login');
+    };
+
     const theme = useTheme()
     const darkMode = ref(false);
     function toggleTheme () {

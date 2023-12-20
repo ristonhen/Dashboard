@@ -12,10 +12,10 @@ export const useAuthStore = defineStore(
       user: null,
     }),
     actions: {
-      setRoute(r){
-        localStorage.setItem('r_', r);
+      setRoute(route){
+        const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(route), depass).toString()
+        localStorage.setItem('route', encryptedToken);
       },
-      
       setTokenAndUser(user,token) {
         this.user = user
         this.token = token;
@@ -26,7 +26,7 @@ export const useAuthStore = defineStore(
       logout() {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
-        window.location.reload()
+        localStorage.removeItem('route')
       },
       async submitHandler(username, password) {
         const formData = new FormData();
@@ -43,7 +43,7 @@ export const useAuthStore = defineStore(
             const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), depass).toString();
             const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(access_token), depass).toString()
             this.setTokenAndUser(encryptedUser,encryptedToken)
-            window.location.reload()
+            // window.location.reload()
             // this.$router.push('/Dashboard')
             return { message, status }
           } else {
@@ -59,9 +59,12 @@ export const useAuthStore = defineStore(
     getters: {
       getUser() {
         const data = JSON.parse(localStorage.getItem('user'))
-        const bytes  = CryptoJS.AES.decrypt(data, depass);
-        const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        return decryptedData
+        if(data){
+          const bytes  = CryptoJS.AES.decrypt(data, depass);
+          const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+          return decryptedData
+        }
+        return null
       },
       getToken() {
         const data = JSON.parse(localStorage.getItem('token'))
@@ -73,8 +76,14 @@ export const useAuthStore = defineStore(
         return null
       },
       getRoute(){
-        return localStorage.getItem('r_')
-      }
+        const data = localStorage.getItem('route')
+        if(data){
+          const bytes  = CryptoJS.AES.decrypt(data, depass);
+          const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+          return JSON.parse(decryptedData)
+        }
+        return null
+      },
     }
   }
 )

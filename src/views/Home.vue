@@ -38,35 +38,62 @@
   </v-app>
 </template>
 <script>
-  import { onMounted } from 'vue'
-  import Navbar from './dashboard/Navbar.vue'
-  import Headers from './dashboard/Headers.vue'
-  import Container from './dashboard/Container.vue'
-  export default {
-    name: 'Home',
-    components: { Navbar, Headers , Container },
-    data: () => ({ 
-      manageApp: [
-        { apptitle: 'App Admin', logo: '../assets/canalogo.webp'} 
-      ],
-      drawer: true,
-      rail: false, 
-    }),
-    methods:{
-      toggleDrawer(newValue){
-        this.drawer = newValue
-      },
-      toggleRail(newRail){
-        this.drawer = newRail
-      },
-      
+import { useAuthStore } from '@/store/authStore'
+import { useRoute, useRouter } from 'vue-router';
+
+import Navbar from './dashboard/Navbar.vue'
+import Headers from './dashboard/Headers.vue'
+import Container from './dashboard/Container.vue'
+import Search from '@/components/Search.vue'
+
+export default {
+  name: 'Home',
+  components: { Navbar, Headers , Container },
+  data: () => ({ 
+    manageApp: [
+      { apptitle: 'App Admin', logo: '../assets/canalogo.webp'} 
+    ],
+    drawer: true,
+    rail: false, 
+  }),
+  methods:{
+    toggleDrawer(newValue){
+      this.drawer = newValue
     },
-    setup() {
-      onMounted(() => {
-        // console.log(user); // Log the user object to the console after component is mounted
-      });
+    toggleRail(newRail){
+      this.drawer = newRail
     },
-  }
+    async registerRoutesFromStorage() {
+      const authStore = useAuthStore()
+      const { getRoute } = authStore;
+      const dynamicRoutes = await getRoute
+      if (dynamicRoutes) {
+        dynamicRoutes.forEach((route) => {
+          this.$router.addRoute('Home', {
+            path: `/${route.name}`,
+            name: `${route.path}`,
+            component: () => import(`@/views/menu/${route.name}.vue`),
+            props: true,
+          });
+        });
+      }
+    },
+  },
+  mounted(){
+    this.registerRoutesFromStorage()
+  },
+//   beforeRouteEnter(to, from) {
+//     console.log("testing beforeRouteEnter")
+//   },
+//   beforeRouteUpdate(to, from) {
+//     console.log("testing beforeRouteUpdate")
+//   },
+  // beforeRouteLeave (to, from) {
+  //   const answer = window.confirm('Do you really want to leave? you have unsaved changes!')
+  //   if (!answer) return false
+  // }
+
+}
 </script>
 <style lang="sass">
   .v-navigation-drawer__content

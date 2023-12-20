@@ -7,22 +7,13 @@ import DashboardVue from "@/views/menu/Dashboard.vue"
 import Utest from "@/views/menu/ManageUser.vue"
 import Search from '@/components/Search.vue'
 
-import { useAuthStore } from '@/store/authStore'
+import CryptoJS from 'crypto-js'
+const depass = `${import.meta.env.VITE_DEPASS}`;
 
-var r=[]
-if (localStorage.getItem('r_')) {
-  const parsedR = JSON.parse(localStorage.getItem('r_'));
-    
-  r = parsedR.map((route) => ({
-      path: `${route.name}`,
-      name: `${route.path}`,
-      component: () => import(`@/views/menu/${route.name}.vue`),
-      props: true,
-  }));
-} 
+
 const routes = [
   {
-    path: '/:catchAll(.*)',
+    path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: NotFound,
   },
@@ -45,22 +36,10 @@ const routes = [
             path: '/Dashboard',
             name: 'Dashboard',
             component: DashboardVue,
-            meta: {
-              requiresAuth: true
-            }
           },
-          {
-            path: '/search',
-            name: 'search',
-            component: Search,
-            meta: {
-              requiresAuth: true
-            }
-          },
-          ...r],
+        ],
       }
     ],
-    
   },
   {
     path: '',
@@ -100,34 +79,27 @@ const routes = [
     ]
   }
 ]
-
+const addRoutesFromStorage = async () => {
+  const data = localStorage.getItem('route')
+  if (data){
+    const bytes  = CryptoJS.AES.decrypt(data, depass);
+    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    const dynamicRoutes = JSON.parse(decryptedData)
+    dynamicRoutes.forEach((route) => {
+      router.addRoute('Home', {
+        path: `/${route.name}`,
+        name: `${route.path}`,
+        component: () => import(`@/views/menu/${route.name}.vue`),
+        props: true,
+      });
+    });
+  }
+};
 const router = createRouter({
   history: createWebHistory(),
   routes,
 })
-// check token before login and dynamic header title name
-router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
-  // get token from localStorage
-  const token = authStore.getToken
-  if(to.matched.some(record => record.meta.requiresAuth)){
-    if (!token) {
-      next('/login');
-    } else {
-      next();
-    }
-  }else if (to.matched.some(record => record.meta.requiresNoAuth)) {
-    if (token) {
-      next('/');
-    } else {
-      next();
-    }
-  }else {
-    // Call the next() function to continue navigating
-    next();
-  }
-  // Set the document title based on the name of the current route
-  // document.title = to.name + ' - APP';
-  document.title = 'APP';
-});
+
+
+addRoutesFromStorage();
 export default router

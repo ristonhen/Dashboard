@@ -65,15 +65,12 @@
       {{ messageText }}
     </v-snackbar>
   </v-app>
-  <!-- <ResetPassword v-else/> -->
 </template>
 
 <script>
 import { useAuthStore } from '@/store/authStore'
-import ResetPassword from '@/views/menu/Resetpwd.vue'
 export default {
   name: 'Login',
-  components: { ResetPassword },
   data: () => ({
     messageText: "",
     error: null,
@@ -92,6 +89,9 @@ export default {
     ],
   }),
   methods:{
+    navigateToDashboard() {
+      this.$router.push('/search');
+    },
     async submitHandler(){
       const { valid } = await this.$refs.form.validate()
       if (valid){
@@ -102,6 +102,10 @@ export default {
           this.success = true
           this.messageText = response_login.message
           this.loading = false
+          
+        }else{
+          this.loading = false
+          this.$router.push('/');
         }
       }
       
