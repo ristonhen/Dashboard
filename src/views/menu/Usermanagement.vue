@@ -102,7 +102,7 @@
 </template>
 <script>
 import axios from 'axios'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import ModalDialog from '@/components/ModalDialog.vue'
 const baseUrl = `${import.meta.env.VITE_API_URL}/users`
 const authStore = useAuthStore()
@@ -247,6 +247,7 @@ export default {
     dialogTitle(){
       return this.editedIndex === -1 ? 'Add users' : 'Edit users'
     },
+    
   },
   methods:{
     handlerHover(value){
@@ -310,6 +311,7 @@ export default {
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/users`
       const token = await authStore.getToken
+      console.log(token)
       try {
         const respone = await axios.get(baseUrl,{
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }

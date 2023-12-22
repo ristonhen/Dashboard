@@ -14,7 +14,7 @@ export const useAuthStore = defineStore(
     actions: {
       setRoute(route){
         const encryptedToken = CryptoJS.AES.encrypt(JSON.stringify(route), depass).toString()
-        localStorage.setItem('route', encryptedToken);
+        sessionStorage.setItem('route', encryptedToken);
       },
       setTokenAndUser(user,token) {
         this.user = user

@@ -102,7 +102,7 @@
 </template>
 <script>
 import axios from 'axios'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import ModalDialog from '@/components/ModalDialog.vue'
 const baseUrl = `${import.meta.env.VITE_API_URL}/configuration`
 const authStore = useAuthStore()

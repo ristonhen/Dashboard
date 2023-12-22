@@ -2,7 +2,7 @@
     <RecursiveMenu :menuItems="menuItems"></RecursiveMenu>
 </template>
 <script>
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import RecursiveMenu from '@/components/RecursiveMenu.vue'
 import  axios  from 'axios'
 export default {

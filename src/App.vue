@@ -1,6 +1,20 @@
 <template>
   <router-view/>
 </template>
+<script setup>
+import { useItemStore } from "@/stores/item";
+import { useConnectionStore } from "@/stores/connection";
+import { socket } from "@/socket";
+
+const itemStore = useItemStore();
+const connectionStore = useConnectionStore();
+
+// remove any existing listeners (after a hot module replacement)
+socket.off();
+
+itemStore.bindEvents();
+connectionStore.bindEvents();
+</script>
 <style lang="scss">
 :root {
 	--primary: #4ade80;

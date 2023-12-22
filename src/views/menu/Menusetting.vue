@@ -37,17 +37,17 @@
     ></ModalDialog>
   </v-card>
   <!-- Display the entered user data -->
-<v-card v-if="enteredUserData">
+<!-- <v-card v-if="enteredUserData">
   <v-card-title class="headline">Entered User Data</v-card-title>
   <v-card-text>
     <pre>{{ JSON.stringify(enteredUserData, null, 2) }}</pre>
   </v-card-text>
-</v-card>
+</v-card> -->
 </template>
 
 <script>
 import axios from 'axios'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import ModalDialog from '@/components/ModalDialog.vue'
 export default {
   name: 'Usermanagement',

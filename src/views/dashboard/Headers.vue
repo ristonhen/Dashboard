@@ -149,7 +149,7 @@
 </template>
 <script>
 import { useTheme } from 'vuetify'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import { useRoute, useRouter } from 'vue-router';
 import { ref } from 'vue'
 export default {
@@ -237,7 +237,7 @@ export default {
     const logout = () => {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
-      localStorage.removeItem('route')
+      // sessionStorage.removeItem('route')
       router.push('/login');
     };
 

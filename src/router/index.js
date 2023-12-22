@@ -5,7 +5,7 @@ import NotFound from '@/layouts/NotFound.vue'
 import HomeVue from '@/views/Home.vue'
 import DashboardVue from "@/views/menu/Dashboard.vue"
 import Utest from "@/views/menu/ManageUser.vue"
-import Search from '@/components/Search.vue'
+import Test from '@/components/Test.vue'
 
 import CryptoJS from 'crypto-js'
 const depass = `${import.meta.env.VITE_DEPASS}`;
@@ -36,6 +36,11 @@ const routes = [
             path: '/Dashboard',
             name: 'Dashboard',
             component: DashboardVue,
+          },
+          {
+            path: '/Test',
+            name: 'Test',
+            component: Test,
           },
         ],
       }
@@ -79,8 +84,13 @@ const routes = [
     ]
   }
 ]
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+})
+
 const addRoutesFromStorage = async () => {
-  const data = localStorage.getItem('route')
+  const data = sessionStorage.getItem('route')
   if (data){
     const bytes  = CryptoJS.AES.decrypt(data, depass);
     const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
@@ -95,11 +105,5 @@ const addRoutesFromStorage = async () => {
     });
   }
 };
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
-
-
 addRoutesFromStorage();
 export default router

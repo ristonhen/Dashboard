@@ -38,7 +38,7 @@
   </v-app>
 </template>
 <script>
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import { useRoute, useRouter } from 'vue-router';
 
 import Navbar from './dashboard/Navbar.vue'
@@ -85,9 +85,9 @@ export default {
 //   beforeRouteEnter(to, from) {
 //     console.log("testing beforeRouteEnter")
 //   },
-//   beforeRouteUpdate(to, from) {
-//     console.log("testing beforeRouteUpdate")
-//   },
+  beforeRouteUpdate(to, from) {
+    // this.registerRoutesFromStorage()
+  },
   // beforeRouteLeave (to, from) {
   //   const answer = window.confirm('Do you really want to leave? you have unsaved changes!')
   //   if (!answer) return false
