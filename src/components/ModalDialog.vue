@@ -1,13 +1,13 @@
 <template>
   <v-dialog v-model="dialogVisible" persistent max-width="600px" >
     <v-card>
-      <v-card-title class="bg-blue-grey-darken-2">{{ dialogTitle }}</v-card-title>
+      <v-card-title class="bg-blue-grey">{{ dialogTitle }}</v-card-title>
       <v-card-text>
         <v-form ref="form">
-          <v-row>
-            <v-col v-for="(field, index) in formFields" :key="index" cols="6" sm="6">
+          <v-row no-gutters>
+            <v-col v-for="(field, index) in formFields" :key="index" cols="12" sm="6" xs="12" class="mt-3">
               <template v-if="field.component === 'v-radio-group'">
-                <v-radio-group v-model="formData[field.name]" :label="field.label || field.name" :required="field.required" inline>
+                <v-radio-group v-model="formData[field.name]" :label="field.label || field.name" :required="field.required" inline >
                   <v-radio
                     v-for="(option, optionIndex) in field.options"
                     :key="optionIndex"
@@ -21,6 +21,7 @@
               </template>
               <template v-else-if="field.component === 'v-select'">
                 <v-select
+                  class="pb-2 mx-2"
                   v-model="formData[field.name]"
                   :label="field.label"
                   :items="field.items"
@@ -34,6 +35,7 @@
               </template>
               <template v-else-if="field.component === 'v-combobox'">
                 <v-combobox
+                  class="pb-2 mx-2"
                   v-model="formData[field.name]"
                   :label="field.label"
                   :items="field.items"
@@ -58,6 +60,7 @@
               </template>
               <template v-else-if="field.component === 'v-autocomplete'">
                 <v-autocomplete
+                  class="pb-2 mx-2"
                   v-model="formData[field.name]"
                   :label="field.label"
                   :items="field.items"
@@ -71,6 +74,7 @@
               </template>
               <template v-else-if="field.component === 'v-text-field'">
                 <component
+                  class="pb-2 mx-2"
                   :is="field.component"
                   v-model="formData[field.name]"
                   :label="field.label"
@@ -89,14 +93,17 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          size="large"
+        
+          density="compact"
           class="cancel-button"
-          color="grey-lighten-5" 
+          size="large"
+          icon="mdi-close"
           @click="closeDialog"
-        >X</v-btn>
+        ></v-btn>
         <v-btn
-          variant="outlined"
-          color="blue-grey-darken-3"  
+        
+          variant="flat"
+          color="indigo"
           @click="submitForm"
         >{{ dialogAction }}</v-btn>
       </v-card-actions>
@@ -191,7 +198,8 @@ export default {
     validateRequiredFields() {
       for (const field of this.formFields) {
         if (field.required && !this.formData[field.name]) {
-          this.validationErrors[field.name] = `${field.label} field is required.`
+          // this.validationErrors[field.name] = `${field.label} field is required.`
+          this.validationErrors[field.name] = ' '
         }else if (field.component === "v-select" && this.formData[field.name]) {
           delete this.validationErrors[field.name]
         }else {
@@ -239,7 +247,7 @@ export default {
 <style>
 .cancel-button {
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 5px;
+  right: 7px;
 }
 </style>

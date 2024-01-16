@@ -44,7 +44,6 @@ import { useRoute, useRouter } from 'vue-router';
 import Navbar from './dashboard/Navbar.vue'
 import Headers from './dashboard/Headers.vue'
 import Container from './dashboard/Container.vue'
-import Search from '@/components/Search.vue'
 
 export default {
   name: 'Home',
@@ -81,18 +80,7 @@ export default {
   },
   mounted(){
     this.registerRoutesFromStorage()
-  },
-//   beforeRouteEnter(to, from) {
-//     console.log("testing beforeRouteEnter")
-//   },
-  beforeRouteUpdate(to, from) {
-    // this.registerRoutesFromStorage()
-  },
-  // beforeRouteLeave (to, from) {
-  //   const answer = window.confirm('Do you really want to leave? you have unsaved changes!')
-  //   if (!answer) return false
-  // }
-
+  }
 }
 </script>
 <style lang="sass">

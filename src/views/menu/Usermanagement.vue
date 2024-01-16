@@ -161,7 +161,7 @@ export default {
           required: true,
           variant: "outlined",
           rules: [
-            v => !!v || 'Full Name is required',
+            v => !!v || ' ',
           ]
         },
         {
@@ -171,7 +171,7 @@ export default {
           required: true,
           variant: "outlined",
           rules: [
-            v => !!v || 'User Name is required',
+            v => !!v || ' ',
           ]
         },
         {
@@ -181,7 +181,7 @@ export default {
           required: true,
           variant: "outlined",
           rules: [
-            v => !!v || 'User Name is required',
+            v => !!v || ' ',
           ]
         },
         {
@@ -200,7 +200,7 @@ export default {
           // branch.branch_id
           ),
           rules: [
-            v => !!v || 'Branch name is required',
+            v => !!v || ' ',
           ]
         },
         {
@@ -210,7 +210,7 @@ export default {
           required: false,
           variant: 'outlined',
           rules: [
-            (v) => /^\d{1,11}$/.test(v) || 'Phone number must be 10 or 11 digits',
+            (v) => /^\d{1,11}$/.test(v) || ' ',
           ],
         },
         {
@@ -228,7 +228,7 @@ export default {
           )
           ),
           rules: [
-            v => !!v || 'Role Name is required',
+            v => !!v || ' ',
           ],
         },
         {
@@ -238,8 +238,7 @@ export default {
           required: true,
           variant: "outlined",
           rules: [
-            v => !!v || 'Counter Number is required',
-            v => /^\d{1,10}$/.test(v) || 'Counter Number must be a valid number',
+            v => !!v || ' ',
           ]
         },
       ];

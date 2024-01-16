@@ -8,7 +8,6 @@
         <v-btn color="red-darken-4" icon @click="deleteItem()">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
-        
       </v-sheet >
       <v-btn color="blue-grey-darken-3" @click="editItem()" icon v-if="selected.length ===1">
         <v-icon>mdi-pencil</v-icon>
@@ -46,26 +45,6 @@
         </v-icon>
         <v-icon size="small" color="error" @click="deleteItem(item)"> mdi-delete </v-icon>
       </template>
-
-      <!-- <template v-slot:item="{ item }">
-        <tr :class="{ 'row-hovered': hoveredRow === item }" @mouseover="hoveredRow = item" @mouseleave="hoveredRow = null">
-          <template v-for="header in headers" :key="header.key">
-            <td>
-              {{ item[header.key] }}
-            </td>
-          </template>
-          <td>
-            <template v-if="hoveredRow === item">
-              <v-btn icon small class="mr-2" @click="editItem(item)">
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn icon small color="error" @click="deleteItem(item)">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </template>
-          </td>
-        </tr>
-      </template> -->
     </v-data-table>
     <ModalDialog
       v-model="dialogVisible"
@@ -98,7 +77,6 @@
       Form {{messageText}} successfully.
     </v-snackbar>
   </v-card>
-  <!-- <v-spacer></v-spacer> -->
 </template>
 <script>
 import axios from 'axios'
@@ -146,8 +124,8 @@ export default {
           required: true,
           variant: "outlined",
           rules: [
-            v => !!v || 'Parameter Name is required',
-           ]
+            v => !!v || ' ',
+          ]
         },
        {
           name: 'value',
@@ -156,7 +134,7 @@ export default {
           required: true,
           variant: "outlined",
           rules: [
-            v => !!v || 'Value is required',
+            v => !!v || ' ',
            ]
         },
       ]
@@ -263,12 +241,12 @@ export default {
       if( item ){
         this.selected = [item]
         this.newConfig = {...item}
-        this.dialogAction = 'Edit';
+        this.dialogAction = 'Save';
         this.dialogVisible = true;
       }else if (this.selected.length === 1){
         this.editedIndex = this.configData.indexOf(this.selected[0])
         this.newConfig = { ...this.selected[0] };
-        this.dialogAction = 'Edit';
+        this.dialogAction = 'Save';
         this.dialogVisible = true;
       }
     },
