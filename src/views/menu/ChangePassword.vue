@@ -47,6 +47,12 @@
 
 <script>
 export default {
+  props: {
+    toggleVisible: {
+      type: String,
+      required: true
+    },
+  },
   data() {
     return {
       dialogVisible: false,

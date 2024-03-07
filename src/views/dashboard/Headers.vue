@@ -1,6 +1,5 @@
 <template>
   <v-app-bar
-
   >
     <v-app-bar-nav-icon @click="toggleDrawer"/>
     <v-spacer></v-spacer>
@@ -75,12 +74,16 @@
           :close-on-content-click="false"
           location="bottom"
         >
+          <ChangePassword 
+            v-model="dialogVisible" 
+            @close="closeChangePassword" 
+            :toggleVisible="dialogVisible"/>
           <template v-slot:activator="{ props }">
             <v-btn icon
               color="indigo"
               v-bind="props"
             >
-            <v-icon size="35" color="grey-darken-2" icon="mdi-account-circle-outline"></v-icon>
+            <v-icon size="27" color="grey-darken-2" icon="mdi-account-circle-outline"></v-icon>
             </v-btn>
           </template>
           <v-card min-width="250">
@@ -122,7 +125,9 @@
                   active-class="bg-blue-grey-darken-2"
                   rounded
                   :title="item.text"
+                  @click="handleItemClick(item)"
                 >
+                
                   <template v-slot:prepend>
                     <v-icon :icon="item.icon" size="small"></v-icon>
                   </template>
@@ -151,14 +156,19 @@
 import { useTheme } from 'vuetify'
 import { useAuthStore } from '@/stores/authStore'
 import { useRoute, useRouter } from 'vue-router';
+import ChangePassword from "@/views/menu/ChangePassword.vue"
 import { ref } from 'vue'
 export default {
+  components: {ChangePassword},
   props: [ 'drawer' ],
+
   data(){
     return {
       loaded: false,
       loading: false,
       toggleScreen: true,
+      showChangePassword: false,
+      dialogVisible: false,
       fav: true,
       profile: false,
       message: false,
@@ -223,6 +233,18 @@ export default {
         document.exitFullscreen();
         this.toggleScreen = true
       }
+    },
+    handleItemClick(item) {
+      if (item.text === 'Change password') {
+        // If the clicked item is 'Change password', set the flag to true
+        this.showChangePassword = true;
+      } else {
+        console.log(`Clicked on item: ${item.text}`);
+      }
+    },
+    closeChangePassword() {
+      // This method will be called from the ChangePassword component when it should be closed
+      this.showChangePassword = false;
     },
   },
   mounted(){
