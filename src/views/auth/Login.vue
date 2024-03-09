@@ -78,7 +78,7 @@ export default {
     loading:false,
     snackbar:false,
     passwordShow:false,
-    username: 'ristonhen@gmail.com',
+    username: 'risto.nhen@canadiabank.com.kh',
     emailRules: [
       v => !!v || 'E-mail is required',
       v => /.+@.+\..+/.test(v) || 'E-mail must be valid',

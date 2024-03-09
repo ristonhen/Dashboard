@@ -2,15 +2,18 @@
   <v-card>
     <v-card-title class="d-flex justify-end align-center">
       <v-btn color="blue-grey-darken-3" @click="openDialog" icon>
-        <v-icon>mdi-plus</v-icon>
+        <v-icon>mdi-email-plus</v-icon>
       </v-btn>
       <v-sheet class="ps-1" v-if="selected.length > 0">
         <v-btn color="red-darken-4" icon @click="deleteItem()">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </v-sheet >
-      <v-btn color="blue-grey-darken-3" @click="editItem()" icon v-if="selected.length ===1">
+      <v-btn  class="px-1"  color="blue-grey-darken-3" @click="editItem()" icon v-if="selected.length ===1">
         <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+      <v-btn color="blue-grey-darken-3" @click="sentMailRiewUser()" icon v-if="selected.length > 0">
+        <v-icon>mdi-email-arrow-right</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
       <!-- @click:append-inner="onClick" -->
@@ -64,7 +67,7 @@
      >
       <v-card>
         <v-card-title class="text-h5">
-          Delete Configuration
+          Delete Mail
         </v-card-title>
         <v-card-text>Are you sure you want to delete this item?</v-card-text>
         <v-card-actions>
@@ -86,7 +89,7 @@ import ModalDialog from '@/components/ModalDialog.vue'
 const baseUrl = `${import.meta.env.VITE_API_URL}/api/emaildata`
 const authStore = useAuthStore()
 export default {
-  name: 'Configuration',
+  name: 'Mail',
   components:{ ModalDialog },
   data(){
     return {
@@ -99,19 +102,20 @@ export default {
       headers: [
         { align: 'start', key: 'id', sortable: false, title: 'NO'},
         { branchname: 'branchname', title: 'branchname',key: 'branchname' },
-        { cc_email: 'email_to', title: 'email_to',key: 'email_to' },
-        { created_by: 'cc_email', title: 'cc_email' ,key: 'cc_email'},
-        { cc_email: 'pdfimage', title: 'pdfimage',key: 'pdfimage' },
-        { cc_email: 'queue_number', title: 'queue_number',key: 'queue_number' },
+        { email_to: 'email_to', title: 'email_to',key: 'email_to' },
+        { cc_email: 'cc_email', title: 'cc_email',key: 'cc_email' },
+        { pdfimage: 'pdfimage', title: 'pdfimage',key: 'pdfimage' },
+        { queue_number: 'queue_number', title: 'queue_number',key: 'queue_number' },
         { created_date: 'created_date', title: 'created_date',key: 'created_date' },
-        { modified_by: 'iron', title: 'modified_by',key: 'modified_by' },
+        { created_by: 'created_by', title: 'created_by' ,key: 'created_by'},
         { modified_date: 'iron', title: 'modified_date',key: 'modified_date' },
+        { modified_by: 'iron', title: 'modified_by',key: 'modified_by' },
       ],
       emailData: [],
       newMail: {
         branchname: 'Kampot11 branch',
-        email_to: '',
-        cc_email: '',
+        email_to: 'risto.nhen@canadiabank.com.kh,risto.nhen@canadiabank.com.kh',
+        cc_email: 'risto.nhen@canadiabank.com.kh,risto.nhen@canadiabank.com.kh',
         pdfimage: 'Kamport Branch.pdf',
         queue_number: '3',
         created_date: "2024-02-28T14:02:18.940Z",
@@ -181,20 +185,17 @@ export default {
       ]
     },
     dialogTitle(){
-      return this.editedIndex === -1 ? 'Add Configuration' : 'Edit Configuration'
+      return this.editedIndex === -1 ? 'Add Mail' : 'Edit Mail'
     },
   },
   methods:{
     formatDataForDatabase(data) {
-      // Clone the data to avoid modifying the original object
       const formattedData = {...data };
-
-      // Extract email_to and cc_email data and format it
       formattedData.email_to = {
-        recipient_list: formattedData.email_to,
+        recipient_list: formattedData.email_to.split(","),
       };
       formattedData.cc_email = {
-        cc_recipient_list: formattedData.cc_email,
+        cc_recipient_list: formattedData.cc_email.split(","),
       };
 
       return [formattedData];
@@ -222,31 +223,43 @@ export default {
           this.emailData = respone.data.data.emaildata
         }
       } catch (error) {
-        console.error('Error fetching Configuration data:', error)
+        console.error('Error fetching Mail data:', error)
       }
     },
     async addMail() {
       const baseUrl = `${import.meta.env.VITE_API_URL}/api/emaildata`
       const authStore = useAuthStore()
       const token = authStore.getToken
+
+      const formatData = (data) => {
+        const formattedData = { ...data };
+        formattedData.email_to = {
+          recipient_list: formattedData.email_to.split(","),
+        };
+        formattedData.cc_email = {
+          cc_recipient_list: formattedData.cc_email.split(","),
+        }
+
+        return [formattedData]
+      }
       try {
         // Format the data before sending it to the API
-        const formattedData = this.formatDataForDatabase(this.newMail);
-        console.log(formattedData)
+        const formattedData = formatData(this.newMail)
         const response = await axios.post(baseUrl, formattedData, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         })
-        console.log(response)
         if(response.data.status == 201){
-          this.emailData.push( response.data.data )
+          this.emailData.unshift(response.data.data.emaildata[0])
           this.successMessageVisible = true
           this.messageText = 'Add'
+        }else{
+          console.log(response.data.message)
         }
       } catch (error) {
-        console.error('Error adding Configuration :', error);
+        console.error('Error adding Mail :', error);
       }
     },
     
@@ -259,7 +272,6 @@ export default {
       if (this.selected.length > 0) {
         for (const selectedItem of this.selected) {
           deleteIds.push(selectedItem.id)
-          console.log(selectedItem)
         }
       }
       // delete in database
@@ -271,7 +283,8 @@ export default {
           },
           data: { ids: deleteIds },
         })
-        if(response.data.status == true){
+
+        if(response.data.status === 200 ){
           // delete 1 row
           if(this.editedIndex !== -1){
             this.emailData.splice(this.editedIndex, 1)
@@ -304,7 +317,15 @@ export default {
         this.dialogVisible = true;
       }else if (this.selected.length === 1){
         this.editedIndex = this.emailData.indexOf(this.selected[0])
-        this.newMail = { ...this.selected[0] };
+
+        const selectedrow = this.selected[0]
+        const email_to = selectedrow.email_to.recipient_list.join(', ')
+        const cc_email= selectedrow.cc_email.cc_recipient_list.join(', ')
+
+        this.newMail = { ...this.selected[0] }
+        this.newMail.email_to = email_to
+        this.newMail.cc_email = cc_email
+       
         this.dialogAction = 'Save';
         this.dialogVisible = true;
       }
@@ -313,10 +334,17 @@ export default {
       const baseUrl = `${import.meta.env.VITE_API_URL}/api/emaildata`;
       const authStore = useAuthStore();
       const token = authStore.getToken;
+      const dataUpdate = { ...this.newMail }
+      dataUpdate.email_to = {
+        recipient_list: dataUpdate.email_to.split(","),
+      }
+      dataUpdate.cc_email = {
+        cc_recipient_list: dataUpdate.cc_email.split(","),
+      }
       try {
         const response = await axios.put(
           `${baseUrl}/${this.newMail.id}`,
-          this.newMail,
+          dataUpdate,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -324,17 +352,16 @@ export default {
             },
           }
         );
-        if (response.data.status === 'success') {
-          //Find the updated configuration in the emailData array
+        if (response.data.status === 200) {
+          //Find the updated Mail in the emailData array
           
-          const updatedConfig = response.data.data;
-          if (updatedConfig) {
-            const configIndex = this.emailData.findIndex(
-              (config) => config.id === updatedConfig.id
-            );
+          const updatedMail = response.data.data.emaildata;
+          console.log(updatedMail)
+          if (updatedMail) {
+            const configIndex = this.emailData.findIndex((config) => config.id === updatedMail.id);
             if (configIndex !== -1) {
-              // Replace the configuration at the corresponding index with the response data
-              this.emailData.splice(configIndex, 1, updatedConfig);
+              // Replace the Mail at the corresponding index with the response data
+              this.emailData.splice(configIndex, 1, updatedMail);
             }
           }
           this.selected = []
@@ -343,7 +370,7 @@ export default {
           this.messageText = 'Update'
         }
       } catch (error) {
-        console.error('Error updating Configuration:', error);
+        console.error('Error updating Mail:', error);
       }
     },
     submitForm() {
@@ -353,6 +380,42 @@ export default {
         this.updateConfig()
       }
     },
+    async sentMailRiewUser(){      
+      const selectedrow = this.selected
+      const baseUrl = `${import.meta.env.VITE_API_URL}/api/amlreview/`
+      const authStore = useAuthStore()
+      const token = authStore.getToken
+
+      const sentMail = {
+        email_data: selectedrow.map(item => ({
+          branchname: item.branchname,
+          email_to: item.email_to.recipient_list,
+          cc_email: item.cc_email.cc_recipient_list,
+          pdfimage: item.pdfimage
+        }))
+      };
+      try {
+        // Format the data before sending it to the API
+        const formattedData = this.formatDataForDatabase(this.newMail)
+        const response = await axios.post(baseUrl, sentMail, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        console.log(response)
+        if(response.data.status == 201){
+          this.emailData.unshift(response.data.data.emaildata[0])
+          this.successMessageVisible = true
+          this.messageText = 'Add'
+        }else{
+          console.log(response.data.message)
+        }
+      } catch (error) {
+        console.error('Error adding Mail :', error);
+      }
+
+    }
   },
   mounted(){
     this.getMaildata()
