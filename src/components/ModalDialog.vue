@@ -101,7 +101,6 @@
           @click="closeDialog"
         ></v-btn>
         <v-btn
-        
           variant="flat"
           color="indigo"
           @click="submitForm"
@@ -116,12 +115,12 @@ export default {
   name: 'Modaldialog',
   props: {
     toggleVisible: {
-      type: String,
+      type: Boolean,
       required: true
     },
     value: {
       type: Boolean,
-      required: true
+      required: false
     },
     dialogTitle: {
       type: String,

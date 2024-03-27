@@ -6,6 +6,8 @@ import HomeVue from '@/views/Home.vue'
 import DashboardVue from "@/views/menu/Dashboard.vue"
 import Utest from "@/views/menu/ManageUser.vue"
 import Test from '@/components/Test.vue'
+import DropZone from '@/components/Utilities/DropZone.vue'
+import HomeTest from '@/components/Utilities/HomeTest.vue'
 
 import CryptoJS from 'crypto-js'
 const depass = `${import.meta.env.VITE_DEPASS}`;
@@ -58,6 +60,24 @@ const routes = [
         meta: {
           requiresNoAuth: true
         }
+      },
+      {
+        path: '',
+        name: 'hometest',
+        component: BlankLayout,
+        meta: {
+          requiresNoAuth: true
+        },
+        children: [
+          {
+            path: '/dragdrop',
+            name: 'dragdrop',
+            component: HomeTest,
+            meta: {
+              requiresNoAuth: true
+            }
+          }
+        ]
       },
       {
         path: '/resetpassword/:param',

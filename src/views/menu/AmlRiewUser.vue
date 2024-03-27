@@ -16,6 +16,17 @@
         <v-icon>mdi-email-arrow-right</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
+
+
+      <v-btn color="blue-grey-darken-3" @click="openUploadDialog " icon>
+        <v-icon>mdi-import</v-icon>
+      </v-btn>
+      <Upload 
+        v-model="uploadDialog"
+        @submitFiles="handleSubmittedFiles"
+        :toggleUploadVisible="dialogVisible"
+        @closeUploadDialog="closeUploadDialog"
+      />
       <!-- @click:append-inner="onClick" -->
       <v-text-field
           variant="solo"
@@ -77,27 +88,67 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar v-model="successMessageVisible" :timeout="1000" color="success" class="snackbar-bottom-right">
+
+    <v-dialog
+      v-model="dialog"
+      max-width="320"
+      persistent
+    >
+      <v-list
+        class="py-2"
+        color="primary"
+        elevation="12"
+        rounded="lg"
+      >
+        <v-list-item
+          prepend-icon="$vuetify-outline"
+          title="Processing Application..."
+        >
+          <template v-slot:prepend>
+            <div class="pe-4">
+              <v-icon color="primary" size="x-large"></v-icon>
+            </div>
+          </template>
+
+          <template v-slot:append>
+            <v-progress-circular
+              color="primary"
+              indeterminate="disable-shrink"
+              size="16"
+              width="2"
+            ></v-progress-circular>
+          </template>
+        </v-list-item>
+      </v-list>
+    </v-dialog>
+    <v-snackbar v-model="successMessageVisible" :timeout="1500" color="success" class="snackbar-bottom-right">
       Form {{messageText}} successfully.
     </v-snackbar>
   </v-card>
 </template>
 <script>
+
+import { ref } from "vue";
+import * as XLSX from "xlsx";
+
 import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 import ModalDialog from '@/components/ModalDialog.vue'
+import Upload from '@/components/Utilities/Upload.vue'
 const baseUrl = `${import.meta.env.VITE_API_URL}/api/emaildata`
 const authStore = useAuthStore()
 export default {
   name: 'Mail',
-  components:{ ModalDialog },
+  components:{ ModalDialog , Upload },
   data(){
     return {
+      dialog: false,
       selected: [],
       dialogDelete: false,
       editedIndex: -1,
       dialogVisible: false,
       dialogAction: 'Add',
+      uploadDialog:false,
       search: '',
       headers: [
         { align: 'start', key: 'id', sortable: false, title: 'NO'},
@@ -113,10 +164,10 @@ export default {
       ],
       emailData: [],
       newMail: {
-        branchname: 'Kampot11 branch',
-        email_to: 'risto.nhen@canadiabank.com.kh,risto.nhen@canadiabank.com.kh',
-        cc_email: 'risto.nhen@canadiabank.com.kh,risto.nhen@canadiabank.com.kh',
-        pdfimage: 'Kamport Branch.pdf',
+        branchname: '',
+        email_to: '',
+        cc_email: '',
+        pdfimage: '',
         queue_number: '3',
         created_date: "2024-02-28T14:02:18.940Z",
         created_by: "rijsjtosd"
@@ -211,6 +262,14 @@ export default {
       this.dialogAction = 'Add'
       this.formFields = {}
     },
+
+    openUploadDialog() {
+      this.uploadDialog = true    
+    },
+    closeUploadDialog() {
+      this.uploadDialog = false
+    },
+    
     async getMaildata(){
       const authStore = useAuthStore();
       const baseUrl = `${import.meta.env.VITE_API_URL}/api/emaildata`
@@ -380,7 +439,8 @@ export default {
         this.updateConfig()
       }
     },
-    async sentMailRiewUser(){      
+    async sentMailRiewUser(){ 
+      this.dialog = true   
       const selectedrow = this.selected
       const baseUrl = `${import.meta.env.VITE_API_URL}/api/amlreview/`
       const authStore = useAuthStore()
@@ -395,19 +455,20 @@ export default {
         }))
       };
       try {
-        // Format the data before sending it to the API
-        const formattedData = this.formatDataForDatabase(this.newMail)
         const response = await axios.post(baseUrl, sentMail, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         })
-        console.log(response)
-        if(response.data.status == 201){
-          this.emailData.unshift(response.data.data.emaildata[0])
-          this.successMessageVisible = true
-          this.messageText = 'Add'
+        if(response.data.status == 200){
+          setTimeout(() => {
+            this.dialog = false
+            this.selected = []
+            this.successMessageVisible = true
+            this.messageText = 'Sent'
+          }, 4000)
+          
         }else{
           console.log(response.data.message)
         }
@@ -415,7 +476,65 @@ export default {
         console.error('Error adding Mail :', error);
       }
 
+    },
+    handleSubmittedFiles(files) {
+    if (files.length > 0) {
+      const file = files[0];
+      const fileReader = new FileReader();
+      fileReader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        if (jsonData.length > 1) {
+          const formattedData = jsonData.slice(1).map((row) => {
+            const formattedRow = {
+              branchname: row[0],
+              email_to: {
+                recipient_list: row[1].split(","),
+              },
+              cc_email: {
+                cc_recipient_list: row[2].split(","),
+              },
+              pdfimage: row[3],
+              queue_number: row[4].toString(),
+              created_date: new Date(),
+              created_by: "ristonhen",
+            };
+            return formattedRow;
+          });
+          const authStore = useAuthStore();
+          const token = authStore.getToken;
+          try {
+            const postData = async () => {
+              const response = await axios.post(baseUrl, formattedData, {
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+                },
+              })
+              if(response.data.status == 201){
+                const importedEmailData = response.data.data.emaildata;
+                importedEmailData.forEach((email) => {
+                  this.emailData.unshift(email);
+                })
+                this.successMessageVisible = true
+                this.messageText = 'Import'
+              }else{
+                console.log(response.data.message)
+             }
+              // console.log('Data import successfully:', response.data.data);
+            };
+            postData();
+          } catch (error) {
+            console.error('Error inserting data:', error);
+          }
+        }
+      };
+      fileReader.readAsArrayBuffer(file);
     }
+  }
   },
   mounted(){
     this.getMaildata()
